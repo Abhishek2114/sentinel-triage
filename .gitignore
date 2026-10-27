@@ -28,6 +28,7 @@ htmlcov/
 data/synthetic/*.log
 data/synthetic/*.jsonl
 eval/results/*.json
+!eval/results/heldout.json
 
 # Docker
 *.pid

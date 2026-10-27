@@ -1,0 +1,3308 @@
+{
+  "source": {
+    "generator": {
+      "seeds": [
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018,
+        1019,
+        1020,
+        1021,
+        1022,
+        1023,
+        1024,
+        1025,
+        1026,
+        1027,
+        1028,
+        1029,
+        1030,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036,
+        1037,
+        1038,
+        1039,
+        1040,
+        1041,
+        1042,
+        1043,
+        1044,
+        1045,
+        1046,
+        1047,
+        1048,
+        1049
+      ],
+      "hours": 6,
+      "events_per_minute": 20,
+      "faults_per_run": 4
+    }
+  },
+  "window_minutes": 1,
+  "detectors": [
+    {
+      "detector": "error_burst",
+      "precision": 0.9695,
+      "recall": 0.855,
+      "f1": 0.9087,
+      "mttd_seconds": 246.3,
+      "median_ttd_seconds": 240.0,
+      "false_alarms_per_day": 0.48,
+      "anomalies": 197,
+      "true_positives": 191,
+      "faults": 200,
+      "detected": 171,
+      "hours": 299.85,
+      "recall_by_fault_type": {
+        "bad_deploy": {
+          "detected": 46,
+          "total": 49
+        },
+        "cpu_spike": {
+          "detected": 37,
+          "total": 43
+        },
+        "db_connection_failure": {
+          "detected": 50,
+          "total": 51
+        },
+        "memory_leak": {
+          "detected": 38,
+          "total": 57
+        }
+      }
+    },
+    {
+      "detector": "iforest",
+      "precision": 0.3754,
+      "recall": 0.865,
+      "f1": 0.5235,
+      "mttd_seconds": 204.6,
+      "median_ttd_seconds": 120.0,
+      "false_alarms_per_day": 33.7,
+      "anomalies": 674,
+      "true_positives": 253,
+      "faults": 200,
+      "detected": 173,
+      "hours": 299.85,
+      "recall_by_fault_type": {
+        "bad_deploy": {
+          "detected": 45,
+          "total": 49
+        },
+        "cpu_spike": {
+          "detected": 35,
+          "total": 43
+        },
+        "db_connection_failure": {
+          "detected": 51,
+          "total": 51
+        },
+        "memory_leak": {
+          "detected": 42,
+          "total": 57
+        }
+      }
+    }
+  ],
+  "runs": [
+    {
+      "run": "seed 1000",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.5385,
+          "recall": 0.75,
+          "f1": 0.6269,
+          "mttd_seconds": 140.0,
+          "median_ttd_seconds": 60.0,
+          "false_alarms_per_day": 24.03,
+          "anomalies": 13,
+          "true_positives": 7,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1001",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4545,
+          "recall": 1.0,
+          "f1": 0.625,
+          "mttd_seconds": 105.0,
+          "median_ttd_seconds": 90.0,
+          "false_alarms_per_day": 24.01,
+          "anomalies": 11,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1002",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3846,
+          "recall": 1.0,
+          "f1": 0.5556,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 32.01,
+          "anomalies": 13,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1003",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 280.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4,
+          "recall": 1.0,
+          "f1": 0.5714,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 36.01,
+          "anomalies": 15,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1004",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.6364,
+          "recall": 1.0,
+          "f1": 0.7778,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 16.01,
+          "anomalies": 11,
+          "true_positives": 7,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1005",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.8,
+          "recall": 0.75,
+          "f1": 0.7742,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 40.02,
+          "anomalies": 16,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1006",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 315.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3571,
+          "recall": 1.0,
+          "f1": 0.5263,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 36.03,
+          "anomalies": 14,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1007",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4167,
+          "recall": 0.75,
+          "f1": 0.5357,
+          "mttd_seconds": 100.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 28.01,
+          "anomalies": 12,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1008",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 140.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3333,
+          "recall": 0.75,
+          "f1": 0.4615,
+          "mttd_seconds": 80.0,
+          "median_ttd_seconds": 60.0,
+          "false_alarms_per_day": 40.03,
+          "anomalies": 15,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1009",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4615,
+          "recall": 1.0,
+          "f1": 0.6316,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 28.02,
+          "anomalies": 13,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1010",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4615,
+          "recall": 1.0,
+          "f1": 0.6316,
+          "mttd_seconds": 225.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 28.0,
+          "anomalies": 13,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1011",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3077,
+          "recall": 1.0,
+          "f1": 0.4706,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 90.0,
+          "false_alarms_per_day": 36.01,
+          "anomalies": 13,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1012",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4286,
+          "recall": 1.0,
+          "f1": 0.6,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 90.0,
+          "false_alarms_per_day": 32.01,
+          "anomalies": 14,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1013",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.5,
+          "f1": 0.6,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.25,
+          "recall": 0.75,
+          "f1": 0.375,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 48.01,
+          "anomalies": 16,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1014",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.5385,
+          "recall": 0.75,
+          "f1": 0.6269,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 24.02,
+          "anomalies": 13,
+          "true_positives": 7,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1015",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4286,
+          "recall": 1.0,
+          "f1": 0.6,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 32.01,
+          "anomalies": 14,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1016",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3846,
+          "recall": 1.0,
+          "f1": 0.5556,
+          "mttd_seconds": 135.0,
+          "median_ttd_seconds": 90.0,
+          "false_alarms_per_day": 32.02,
+          "anomalies": 13,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1017",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.1818,
+          "recall": 0.5,
+          "f1": 0.2667,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 36.01,
+          "anomalies": 11,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1018",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4286,
+          "recall": 1.0,
+          "f1": 0.6,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 32.02,
+          "anomalies": 14,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1019",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 320.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3846,
+          "recall": 0.75,
+          "f1": 0.5085,
+          "mttd_seconds": 340.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 32.01,
+          "anomalies": 13,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1020",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 225.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4,
+          "recall": 0.75,
+          "f1": 0.5217,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 36.02,
+          "anomalies": 15,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1021",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.1333,
+          "recall": 0.5,
+          "f1": 0.2105,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 52.02,
+          "anomalies": 15,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1022",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2,
+          "recall": 0.75,
+          "f1": 0.3158,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 48.02,
+          "anomalies": 15,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1023",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4615,
+          "recall": 1.0,
+          "f1": 0.6316,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 28.01,
+          "anomalies": 13,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1024",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 24.01,
+          "anomalies": 12,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1025",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3529,
+          "recall": 1.0,
+          "f1": 0.5217,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 44.05,
+          "anomalies": 17,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1026",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 195.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "mttd_seconds": 90.0,
+          "median_ttd_seconds": 90.0,
+          "false_alarms_per_day": 28.0,
+          "anomalies": 14,
+          "true_positives": 7,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1027",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6667,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 2,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2143,
+          "recall": 0.75,
+          "f1": 0.3333,
+          "mttd_seconds": 440.0,
+          "median_ttd_seconds": 540.0,
+          "false_alarms_per_day": 44.04,
+          "anomalies": 14,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1028",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 440.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2727,
+          "recall": 0.75,
+          "f1": 0.4,
+          "mttd_seconds": 320.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 32.0,
+          "anomalies": 11,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1029",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 315.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2667,
+          "recall": 0.5,
+          "f1": 0.3478,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 44.02,
+          "anomalies": 15,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1030",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 345.0,
+          "median_ttd_seconds": 330.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4706,
+          "recall": 1.0,
+          "f1": 0.64,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 36.04,
+          "anomalies": 17,
+          "true_positives": 8,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1031",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 345.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3077,
+          "recall": 1.0,
+          "f1": 0.4706,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 36.03,
+          "anomalies": 13,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1032",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6667,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 2,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4167,
+          "recall": 0.75,
+          "f1": 0.5357,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 28.02,
+          "anomalies": 12,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1033",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2727,
+          "recall": 0.75,
+          "f1": 0.4,
+          "mttd_seconds": 100.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 32.01,
+          "anomalies": 11,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1034",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3077,
+          "recall": 1.0,
+          "f1": 0.4706,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 36.0,
+          "anomalies": 13,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1035",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 40.02,
+          "anomalies": 16,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1036",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3333,
+          "recall": 1.0,
+          "f1": 0.5,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 40.01,
+          "anomalies": 15,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1037",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3571,
+          "recall": 0.75,
+          "f1": 0.4839,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 36.02,
+          "anomalies": 14,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1038",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3,
+          "recall": 0.75,
+          "f1": 0.4286,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 60.0,
+          "false_alarms_per_day": 28.02,
+          "anomalies": 10,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1039",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4286,
+          "recall": 0.75,
+          "f1": 0.5455,
+          "mttd_seconds": 80.0,
+          "median_ttd_seconds": 60.0,
+          "false_alarms_per_day": 32.02,
+          "anomalies": 14,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1040",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.6667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "mttd_seconds": 330.0,
+          "median_ttd_seconds": 360.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 9,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1041",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3158,
+          "recall": 1.0,
+          "f1": 0.48,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 52.02,
+          "anomalies": 19,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1042",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.8,
+          "recall": 0.75,
+          "f1": 0.7742,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4286,
+          "recall": 1.0,
+          "f1": 0.6,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 32.02,
+          "anomalies": 14,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1043",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2857,
+          "recall": 0.75,
+          "f1": 0.4138,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 40.01,
+          "anomalies": 14,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1044",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3571,
+          "recall": 1.0,
+          "f1": 0.5263,
+          "mttd_seconds": 135.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 36.0,
+          "anomalies": 14,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1045",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.3333,
+          "recall": 0.75,
+          "f1": 0.4615,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 32.03,
+          "anomalies": 12,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1046",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.2667,
+          "recall": 0.75,
+          "f1": 0.3934,
+          "mttd_seconds": 260.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 44.01,
+          "anomalies": 15,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1047",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4167,
+          "recall": 1.0,
+          "f1": 0.5882,
+          "mttd_seconds": 195.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 28.02,
+          "anomalies": 12,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1048",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.4,
+          "recall": 0.75,
+          "f1": 0.5217,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 24.01,
+          "anomalies": 10,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ]
+    },
+    {
+      "run": "seed 1049",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 340.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 0,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "iforest",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 24.02,
+          "anomalies": 12,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

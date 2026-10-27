@@ -1,6 +1,6 @@
 """Detection pipeline: stored events → per-service windows → detectors → anomalies.
 
-The pure part (``detect_service``) works on in-memory windows so it can be
+The pure part (``detect_events``) works on in-memory events so it can be
 unit-tested and evaluated without a database. ``run_detection`` adds the
 database reads and idempotent writes, and is shared by the API and Celery.
 """
@@ -19,7 +19,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.logging import get_logger
 from app.detect.base import AnomalyResult, Detector
 from app.detect.error_burst import ErrorBurstDetector
-from app.detect.features import EventPoint, WindowFeatures, aggregate_windows
+from app.detect.features import EventLike, EventPoint, WindowFeatures, aggregate_windows
 from app.detect.iforest import IForestDetector
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
@@ -36,6 +36,12 @@ DEFAULT_DETECTORS: tuple[str, ...] = tuple(DETECTORS)
 # In the first windows of a series every template counts as "new", which looks
 # like a bad deploy. Those windows are used for fitting but never reported.
 WARMUP_WINDOWS = 5
+
+
+def _check_detectors(detectors: Sequence[str]) -> None:
+    unknown = set(detectors) - DETECTORS.keys()
+    if unknown:
+        raise ValueError(f"Unknown detector(s): {sorted(unknown)}")
 
 
 def merge_anomalous_windows(
@@ -73,6 +79,54 @@ def detect_service(
     """Run one detector over one service's windows and return merged anomalies."""
     results = detector.detect(windows)
     return merge_anomalous_windows(results[warmup_windows:])
+
+
+@dataclass(frozen=True, slots=True)
+class FoundAnomaly:
+    """One merged anomaly from one detector on one service."""
+
+    detector: str
+    service: str
+    window_start: datetime
+    window_end: datetime
+    score: float
+
+
+@dataclass
+class Detections:
+    """Everything one pass over a set of events found."""
+
+    services: list[str] = field(default_factory=list)
+    windows_scored: int = 0
+    anomalies: list[FoundAnomaly] = field(default_factory=list)
+
+
+def detect_events(
+    events: Sequence[EventLike],
+    detectors: Sequence[str] = DEFAULT_DETECTORS,
+    window_minutes: int = 1,
+) -> Detections:
+    """Group events by service, window them and run each detector.
+
+    Pure and in-memory: the API, the Celery task and ``run_eval.py`` all go
+    through here, so the evaluation measures exactly what production runs.
+    """
+    _check_detectors(detectors)
+
+    by_service: dict[str, list[EventLike]] = defaultdict(list)
+    for event in events:
+        by_service[event.service].append(event)
+
+    found = Detections(services=sorted(by_service))
+    for svc in found.services:
+        windows = aggregate_windows(by_service[svc], window_minutes=window_minutes, service=svc)
+        found.windows_scored += len(windows)
+        for name in detectors:
+            for anomaly in detect_service(windows, DETECTORS[name]()):
+                found.anomalies.append(
+                    FoundAnomaly(name, svc, anomaly.window_start, anomaly.window_end, anomaly.score)
+                )
+    return found
 
 
 @dataclass
@@ -118,33 +172,25 @@ async def run_detection(
     on detector + service + window_start) instead of inserting duplicates, and
     an existing anomaly's end and peak score only ever grow.
     """
-    unknown = set(detectors) - DETECTORS.keys()
-    if unknown:
-        raise ValueError(f"Unknown detector(s): {sorted(unknown)}")
+    _check_detectors(detectors)  # before touching the database
 
     events = await load_events(session, since, until, service)
-    by_service: dict[str, list[EventPoint]] = defaultdict(list)
-    for event in events:
-        by_service[event.service].append(event)
+    found = detect_events(events, detectors, window_minutes)
+    summary = DetectionSummary(services=found.services, windows_scored=found.windows_scored)
 
-    summary = DetectionSummary(services=sorted(by_service))
-    rows: list[dict[str, object]] = []
-
-    for svc in summary.services:
-        windows = aggregate_windows(by_service[svc], window_minutes=window_minutes, service=svc)
-        summary.windows_scored += len(windows)
-        for name in detectors:
-            for anomaly in detect_service(windows, DETECTORS[name]()):
-                rows.append({
-                    "detector": name,
-                    "service": svc,
-                    "score": anomaly.score,
-                    "window_start": anomaly.window_start,
-                    "window_end": anomaly.window_end,
-                })
-
-    if rows:
-        insert_stmt = insert(Anomaly).values(rows)
+    if found.anomalies:
+        insert_stmt = insert(Anomaly).values(
+            [
+                {
+                    "detector": a.detector,
+                    "service": a.service,
+                    "score": a.score,
+                    "window_start": a.window_start,
+                    "window_end": a.window_end,
+                }
+                for a in found.anomalies
+            ]
+        )
         upsert = insert_stmt.on_conflict_do_update(
             constraint="uq_anomalies_detector_service_window",
             # Only ever extend: a run over a shorter range (e.g. a rolling

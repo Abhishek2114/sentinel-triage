@@ -1,16 +1,13 @@
 """Unit tests for the detection pipeline's in-memory part."""
 
-from collections import defaultdict
 from datetime import UTC, datetime, timedelta
 
 import pytest
 
 from app.detect.base import AnomalyResult
-from app.detect.error_burst import ErrorBurstDetector
-from app.detect.features import EventPoint, aggregate_windows
-from app.detect.pipeline import detect_service, merge_anomalous_windows
-from app.ingest.parser import parse_line
-from app.ingest.templates import extract_template, template_id
+from app.detect.features import EventPoint
+from app.detect.pipeline import detect_events, merge_anomalous_windows
+from app.eval.harness import evaluate_run
 from scripts.generate_logs import generate_logs
 
 T0 = datetime(2024, 6, 15, tzinfo=UTC)
@@ -48,40 +45,48 @@ class TestMergeAnomalousWindows:
         assert merge_anomalous_windows([_result(0, False)]) == []
 
 
-def _synthetic_events(seed: int) -> tuple[dict[str, list[EventPoint]], list[dict[str, str]]]:
-    lines, labels = generate_logs(seed=seed)
-    by_service: dict[str, list[EventPoint]] = defaultdict(list)
-    for line in lines:
-        p = parse_line(line)
-        assert p is not None
-        tid = template_id(extract_template(p.message))
-        by_service[p.service].append(EventPoint(p.timestamp, p.service, p.level, tid))
-    return by_service, labels
+def _errors(service: str, minutes: range, per_minute: int) -> list[EventPoint]:
+    return [
+        EventPoint(T0 + timedelta(minutes=m, seconds=i), service, "ERROR", "t")
+        for m in minutes
+        for i in range(per_minute)
+    ]
+
+
+def _quiet(service: str, minutes: range) -> list[EventPoint]:
+    return [EventPoint(T0 + timedelta(minutes=m), service, "INFO", "t") for m in minutes]
+
+
+class TestDetectEvents:
+    def test_each_service_is_scored_separately(self):
+        # A burst on "db" must not be blamed on the quiet "web" service
+        events = [*_quiet("web", range(60)), *_quiet("db", range(60))]
+        events += _errors("db", range(30, 35), per_minute=10)
+        found = detect_events(sorted(events, key=lambda e: e.timestamp), ["error_burst"])
+
+        assert found.services == ["db", "web"]
+        assert found.windows_scored == 120
+        assert [a.service for a in found.anomalies] == ["db"]
+        assert found.anomalies[0].detector == "error_burst"
+
+    def test_unknown_detector_is_rejected(self):
+        with pytest.raises(ValueError, match="nope"):
+            detect_events([], ["nope"])
+
+    def test_no_events(self):
+        found = detect_events([])
+        assert found.services == [] and found.anomalies == []
 
 
 @pytest.mark.parametrize("seed", [2001, 2002, 2003])
 def test_error_burst_finds_injected_faults(seed):
     """Quality guard on labelled synthetic data (seeds not used for tuning).
 
-    Held-out average is precision ~0.95 / recall ~0.82; the bounds below leave
-    room for run-to-run variation while still catching a broken detector.
+    Held-out average is precision 0.95 / recall 0.82 (``scripts/run_eval.py``);
+    the bounds below leave room for run-to-run variation while still catching
+    a broken detector.
     """
-    by_service, labels = _synthetic_events(seed)
-    faults = [
-        (lb["service"], datetime.fromisoformat(lb["window_start"]),
-         datetime.fromisoformat(lb["window_end"]))
-        for lb in labels
-    ]
-
-    found = []
-    for svc, events in by_service.items():
-        for a in detect_service(aggregate_windows(events, service=svc), ErrorBurstDetector()):
-            found.append((svc, a.window_start, a.window_end))
-
-    def overlaps(a, f):
-        return a[0] == f[0] and a[1] < f[2] and a[2] > f[1]
-
-    true_positives = [a for a in found if any(overlaps(a, f) for f in faults)]
-    detected = [f for f in faults if any(overlaps(a, f) for a in found)]
-    assert len(true_positives) / max(len(found), 1) >= 0.75  # precision
-    assert len(detected) / len(faults) >= 0.5  # recall
+    lines, labels = generate_logs(seed=seed)
+    report = evaluate_run(lines, labels, ["error_burst"])["error_burst"]
+    assert report.precision >= 0.75
+    assert report.recall >= 0.5

@@ -1,0 +1,161 @@
+"""Match detected anomalies to ground-truth faults and compute metrics.
+
+Matching rules (kept deliberately simple so the numbers are easy to audit):
+
+- An anomaly is a **true positive** if it overlaps a fault window *on the same
+  service*. An alert on a neighbouring service counts as a false positive,
+  because it would send the on-call engineer to the wrong place.
+- A fault is **detected** if at least one anomaly is a true positive for it.
+- **Time to detect** for a fault is when its first matching alert could have
+  fired – the end of the first flagged window – minus the fault's start,
+  floored at zero. It measures the detector, not the scheduler: in production
+  the Celery beat interval adds up to one more interval of delay.
+"""
+
+from __future__ import annotations
+
+import statistics
+from collections.abc import Iterable, Mapping, Sequence
+from dataclasses import dataclass, field
+from datetime import datetime, timedelta
+from typing import Any
+
+from app.detect.pipeline import FoundAnomaly
+
+
+@dataclass(frozen=True, slots=True)
+class FaultLabel:
+    """One injected fault, as written to ``labels.jsonl`` by the generator."""
+
+    fault_type: str
+    service: str
+    start: datetime
+    end: datetime
+
+    @classmethod
+    def from_dict(cls, raw: Mapping[str, Any]) -> FaultLabel:
+        return cls(
+            fault_type=str(raw["fault_type"]),
+            service=str(raw["service"]),
+            start=datetime.fromisoformat(raw["window_start"]),
+            end=datetime.fromisoformat(raw["window_end"]),
+        )
+
+
+def overlaps(anomaly: FoundAnomaly, fault: FaultLabel) -> bool:
+    """Same service and the half-open intervals intersect."""
+    return (
+        anomaly.service == fault.service
+        and anomaly.window_start < fault.end
+        and anomaly.window_end > fault.start
+    )
+
+
+@dataclass
+class DetectorReport:
+    """Counts for one detector, summable across runs."""
+
+    detector: str
+    anomalies: int = 0
+    true_positives: int = 0
+    faults: int = 0
+    detected: int = 0
+    hours: float = 0.0
+    delays_seconds: list[float] = field(default_factory=list)
+    # fault_type -> [detected, total]
+    by_fault_type: dict[str, list[int]] = field(default_factory=dict)
+
+    @property
+    def false_positives(self) -> int:
+        return self.anomalies - self.true_positives
+
+    @property
+    def precision(self) -> float:
+        # No alerts at all is reported as 0 rather than undefined: a silent
+        # detector shouldn't look perfect
+        return self.true_positives / self.anomalies if self.anomalies else 0.0
+
+    @property
+    def recall(self) -> float:
+        return self.detected / self.faults if self.faults else 0.0
+
+    @property
+    def f1(self) -> float:
+        p, r = self.precision, self.recall
+        return 2 * p * r / (p + r) if p + r else 0.0
+
+    @property
+    def mttd_seconds(self) -> float | None:
+        return statistics.fmean(self.delays_seconds) if self.delays_seconds else None
+
+    @property
+    def median_ttd_seconds(self) -> float | None:
+        return statistics.median(self.delays_seconds) if self.delays_seconds else None
+
+    @property
+    def false_alarms_per_day(self) -> float:
+        return self.false_positives / self.hours * 24 if self.hours else 0.0
+
+    def add(self, other: DetectorReport) -> None:
+        """Fold another run's counts into this one (micro-averaging)."""
+        self.anomalies += other.anomalies
+        self.true_positives += other.true_positives
+        self.faults += other.faults
+        self.detected += other.detected
+        self.hours += other.hours
+        self.delays_seconds.extend(other.delays_seconds)
+        for fault_type, (hit, total) in other.by_fault_type.items():
+            counts = self.by_fault_type.setdefault(fault_type, [0, 0])
+            counts[0] += hit
+            counts[1] += total
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "detector": self.detector,
+            "precision": round(self.precision, 4),
+            "recall": round(self.recall, 4),
+            "f1": round(self.f1, 4),
+            "mttd_seconds": _round(self.mttd_seconds),
+            "median_ttd_seconds": _round(self.median_ttd_seconds),
+            "false_alarms_per_day": round(self.false_alarms_per_day, 2),
+            "anomalies": self.anomalies,
+            "true_positives": self.true_positives,
+            "faults": self.faults,
+            "detected": self.detected,
+            "hours": round(self.hours, 2),
+            "recall_by_fault_type": {
+                ft: {"detected": hit, "total": total}
+                for ft, (hit, total) in sorted(self.by_fault_type.items())
+            },
+        }
+
+
+def _round(value: float | None) -> float | None:
+    return None if value is None else round(value, 1)
+
+
+def score_detector(
+    detector: str,
+    anomalies: Iterable[FoundAnomaly],
+    faults: Sequence[FaultLabel],
+    hours: float,
+    window_minutes: int = 1,
+) -> DetectorReport:
+    """Score one detector's anomalies from one run against that run's faults."""
+    ours = [a for a in anomalies if a.detector == detector]
+    window = timedelta(minutes=window_minutes)
+    report = DetectorReport(detector=detector, anomalies=len(ours), faults=len(faults), hours=hours)
+
+    report.true_positives = sum(1 for a in ours if any(overlaps(a, f) for f in faults))
+
+    for fault in faults:
+        counts = report.by_fault_type.setdefault(fault.fault_type, [0, 0])
+        counts[1] += 1
+        alert_times = [a.window_start + window for a in ours if overlaps(a, fault)]
+        if not alert_times:
+            continue
+        counts[0] += 1
+        report.detected += 1
+        report.delays_seconds.append(max(0.0, (min(alert_times) - fault.start).total_seconds()))
+
+    return report

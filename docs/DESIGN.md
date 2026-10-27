@@ -92,7 +92,7 @@ or scaled independently.
 | **Detect** | windows → merged `AnomalyResult`s, upserted to `anomalies` | `detect/pipeline.py` |
 | **Triage** | anomaly + nearby logs + runbook chunks → `Incident` | `rag/`, `workers/tasks.py` |
 | **Serve** | incident → REST + WebSocket push | `api/` |
-| **Evaluate** | anomalies + ground-truth labels → metrics | `scripts/run_eval.py` |
+| **Evaluate** | seeded runs → same `detect_events` → matched to labels → metrics | `eval/`, `scripts/run_eval.py` |
 
 ## 4. Key decisions
 
@@ -150,6 +150,24 @@ recall and MTTD for each detector, side by side, is. It also makes every later
 change (new feature, new threshold) a measurable experiment, which is exactly
 how §4.9 was found.
 
+**How the numbers are kept honest:**
+- **Same code as production.** Ingest parsing, templating and `detect_events`
+  are the functions the API and Celery task call. The eval doesn't have its
+  own copy that could drift.
+- **Held-out seeds.** Settings were tuned on other seeds; seeds 1000–1049
+  (50 runs, 200 faults) are only ever used for reporting.
+- **Simple, auditable matching.** An anomaly is a true positive if it overlaps
+  a fault *on the same service*; an alert on the wrong service is a false
+  alarm, because it sends the on-call engineer to the wrong place. Time to
+  detect runs from the fault start to the end of the first flagged window.
+  Counts are pooled across runs before dividing, so short runs don't get
+  outsized weight.
+- **Reproducible to the byte.** The generator and detectors are seeded and the
+  report has no timestamp, so rerunning unchanged code reproduces the committed
+  `eval/results/heldout.json` exactly, and `git diff` shows what a change did.
+- **Reported beyond P/R.** False alarms per day (what on-call actually feels)
+  and recall per fault type (which failures a detector is blind to).
+
 **Trade-off:** synthetic faults are cleaner than real incidents. The eval is
 used for relative comparison between detectors, not as a claim about
 production accuracy.
@@ -196,14 +214,17 @@ A plain rule – *too many errors in the last 5 minutes* – did far better. It 
 turned into the `error_burst` detector, with a threshold that scales with each
 service's normal error level instead of a hard-coded count.
 
-Preliminary numbers on 10 synthetic runs (40 faults) **not used for tuning**:
+Results from `run_eval.py` on 50 held-out runs (300 hours, 200 faults):
 
-| Detector | Precision | Recall | F1 | Time to first alert |
-|---|---|---|---|---|
-| `error_burst` | 0.95 | 0.82 | 0.88 | ~3.8 min |
-| `iforest` (5 features) | 0.43 | 0.90 | 0.58 | ~3.0 min |
+| Detector | Precision | Recall | F1 | MTTD | False alarms / day |
+|---|---|---|---|---|---|
+| `error_burst` | 0.97 | 0.85 | 0.91 | 4.1 min | 0.5 |
+| `iforest` (5 features) | 0.38 | 0.86 | 0.52 | 3.4 min | 33.7 |
 
-Phase 3 turns this into a reproducible `run_eval.py` report.
+Recall is the same; the difference is entirely false alarms. Isolation Forest
+alerts about 40 seconds sooner, but no team would keep a pager that goes off
+34 times a day. Both are weakest on memory leaks (38/57 and 42/57): a leak
+builds up slowly instead of producing a burst.
 
 **Decision:** keep both. `error_burst` is the bar; Isolation Forest stays as the
 comparison and because it can, in principle, catch failures that don't raise
@@ -211,7 +232,9 @@ errors (e.g. a new log pattern). The LSTM autoencoder has to beat
 `error_burst`, not just Isolation Forest, to justify its complexity.
 
 **Trade-off:** `error_burst` only sees errors. A failure that shows up as
-silence or as new non-error messages is invisible to it.
+silence, as new non-error messages, or as a slow build-up (the memory-leak
+misses above) is invisible to it. That is the gap the sequence model in
+Phase 6 is meant to close.
 
 ### 4.10 One anomaly per incident, written idempotently
 - **Merge:** consecutive flagged minutes (allowing one quiet minute) become a
@@ -304,8 +327,8 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 |---|---|---|
 | 0–1 ✅ | Skeleton, parser, storage, generator | Foundation |
 | 2 ✅ | Detection writes `anomalies` per service (API + scheduled task) | First real output |
-| 3 | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
+| 3 ✅ | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
 | 4 | RAG + LLM triage | The "wow" feature, now measurable |
 | 5 | Dashboard + Redis-backed WebSocket | Makes it demoable |
 | 6 | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
-| 7 | Hosted demo + screenshots + metrics in README | What a reviewer sees first |
+| 7 | Hosted demo + screenshots | What a reviewer sees first |
