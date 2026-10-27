@@ -21,6 +21,14 @@ celery_app.conf.update(
     task_track_started=True,
     task_acks_late=True,
     worker_prefetch_multiplier=1,
+    # Run with `celery -A app.workers.celery_app beat` (the `beat` service in Compose)
+    beat_schedule={
+        "detect-recent-anomalies": {
+            "task": "detect_anomalies",
+            "schedule": settings.detection_interval_seconds,
+            "kwargs": {"lookback_minutes": settings.detection_lookback_minutes},
+        },
+    },
 )
 
 celery_app.autodiscover_tasks(["app.workers"])

@@ -20,14 +20,17 @@ router = APIRouter(tags=["incidents"])
 @router.get("/anomalies", response_model=list[AnomalyRead])
 async def list_anomalies(
     detector: str | None = Query(None),
+    service: str | None = Query(None),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ) -> list[Anomaly]:
-    """List detected anomalies, optionally filtered by detector."""
-    stmt = select(Anomaly).order_by(Anomaly.detected_at.desc())
+    """List detected anomalies, newest window first, optionally filtered."""
+    stmt = select(Anomaly).order_by(Anomaly.window_start.desc(), Anomaly.id.desc())
     if detector:
         stmt = stmt.where(Anomaly.detector == detector)
+    if service:
+        stmt = stmt.where(Anomaly.service == service)
     stmt = stmt.offset(offset).limit(limit)
     result = await session.execute(stmt)
     return list(result.scalars().all())

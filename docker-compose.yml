@@ -65,6 +65,18 @@ services:
     volumes:
       - ./data:/app/data
 
+  # ── Celery beat (schedules detection) ─────────────
+  beat:
+    build:
+      context: .
+      target: worker
+    command: ["celery", "-A", "app.workers.celery_app", "beat", "--loglevel=info"]
+    env_file: .env
+    environment: *container_env
+    depends_on:
+      redis:
+        condition: service_healthy
+
   # ── React dashboard (dev server) ──────────────────
   # Opt-in until the dashboard is built (Phase 5):
   #   docker compose --profile dashboard up

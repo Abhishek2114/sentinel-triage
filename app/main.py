@@ -52,6 +52,7 @@ def create_app() -> FastAPI:
     )
 
     # Register routers
+    from app.api.routes_detect import router as detect_router
     from app.api.routes_events import router as events_router
     from app.api.routes_health import router as health_router
     from app.api.routes_incidents import router as incidents_router
@@ -64,6 +65,7 @@ def create_app() -> FastAPI:
     app.include_router(events_router, prefix=prefix)
     app.include_router(incidents_router, prefix=prefix)
     app.include_router(ingest_router, prefix=prefix)
+    app.include_router(detect_router, prefix=prefix)
     app.include_router(ws_router, prefix=prefix)
 
     return app

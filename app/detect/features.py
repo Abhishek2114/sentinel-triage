@@ -10,12 +10,36 @@ Features per window:
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
+from typing import Protocol
 
 import numpy as np
 
-from app.schemas import LogEventRead
+
+class EventLike(Protocol):
+    """The fields feature aggregation needs – an ORM row, a schema or a light tuple."""
+
+    @property
+    def timestamp(self) -> datetime: ...
+    @property
+    def service(self) -> str: ...
+    @property
+    def level(self) -> str: ...
+    @property
+    def template_id(self) -> str | None: ...
+
+
+@dataclass(frozen=True, slots=True)
+class EventPoint:
+    """Just the columns detection reads, so it doesn't load full messages from the DB."""
+
+    timestamp: datetime
+    service: str
+    level: str
+    template_id: str | None
+
 
 FEATURE_NAMES = [
     "event_count",
@@ -50,7 +74,7 @@ class WindowFeatures:
 
 
 def aggregate_windows(
-    events: list[LogEventRead],
+    events: Sequence[EventLike],
     window_minutes: int = 1,
     service: str | None = None,
 ) -> list[WindowFeatures]:
@@ -70,7 +94,7 @@ def aggregate_windows(
     n_windows = int((sorted_events[-1].timestamp - start) // window_delta) + 1
 
     # One pass: drop each event straight into its bucket
-    buckets: list[list[LogEventRead]] = [[] for _ in range(n_windows)]
+    buckets: list[list[EventLike]] = [[] for _ in range(n_windows)]
     for evt in sorted_events:
         buckets[int((evt.timestamp - start) // window_delta)].append(evt)
 

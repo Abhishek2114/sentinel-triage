@@ -28,7 +28,7 @@ answers all four, and measures how well it does it.**
 | Type | Requirement | How it's met |
 |---|---|---|
 | Functional | Ingest logs in ISO, syslog and JSON formats | `app/ingest/parser.py` |
-| Functional | Detect anomalous time windows per service | Template features + Isolation Forest (`app/detect/`) |
+| Functional | Detect anomalous time windows per service | Template features + error-burst baseline / Isolation Forest (`app/detect/`) |
 | Functional | Explain each anomaly with evidence and a runbook | RAG over runbooks + LLM (`app/rag/`, Phase 4) |
 | Functional | Push incidents to a live dashboard | WebSocket (`app/api/ws.py`) |
 | Quality | **Measurable** detection quality | Labelled synthetic faults → precision, recall, MTTD (`scripts/run_eval.py`) |
@@ -52,6 +52,7 @@ flowchart LR
     end
 
     subgraph Workers["Celery workers"]
+        B["beat<br/>every 5 min"]
         D["detect_anomalies<br/>per service, per minute"]
         T["triage_anomaly<br/>RAG + LLM"]
     end
@@ -64,6 +65,7 @@ flowchart LR
     F --> I
     G --> I
     I -->|bulk insert| PG
+    B -->|schedule| D
     D -->|read windows| PG
     D -->|anomaly rows| PG
     D -->|enqueue| R --> T
@@ -87,7 +89,7 @@ or scaled independently.
 | **Template** | message → stable template id (`"GC pause <NUM>"`) | `ingest/templates.py` |
 | **Store** | events → `log_events` (batched inserts, committed before 200) | `api/routes_ingest.py` |
 | **Featurize** | events → per-service 1-min `WindowFeatures` | `detect/features.py` |
-| **Detect** | windows → `AnomalyResult` (higher score = more anomalous) | `detect/iforest.py` |
+| **Detect** | windows → merged `AnomalyResult`s, upserted to `anomalies` | `detect/pipeline.py` |
 | **Triage** | anomaly + nearby logs + runbook chunks → `Incident` | `rag/`, `workers/tasks.py` |
 | **Serve** | incident → REST + WebSocket push | `api/` |
 | **Evaluate** | anomalies + ground-truth labels → metrics | `scripts/run_eval.py` |
@@ -143,9 +145,10 @@ without the reader guessing the sign.
 (`labels.jsonl`) alongside the logs, and `run_eval.py` scores every detector on
 **precision**, **recall** and **MTTD** (mean time to detect).
 
-**Why:** "it found some anomalies" isn't a result. A table that says
-a table with precision, recall and MTTD for each detector, side by side, is. It also makes every
-later change (new feature, new threshold) a measurable experiment.
+**Why:** "it found some anomalies" isn't a result. A table with precision,
+recall and MTTD for each detector, side by side, is. It also makes every later
+change (new feature, new threshold) a measurable experiment, which is exactly
+how §4.9 was found.
 
 **Trade-off:** synthetic faults are cleaner than real incidents. The eval is
 used for relative comparison between detectors, not as a claim about
@@ -180,6 +183,49 @@ own clients.
 - **Optional:** if the LLM is down or no key is set, the incident is still
   created with a template-based summary. Detection never depends on the LLM.
 - **Bounded cost:** one call per anomaly (unique `anomaly_id`), capped input size.
+
+### 4.9 A simple baseline beat the ML model, so it stays in
+**What happened:** the plan was "Isolation Forest on the five window features."
+Before building on it, I measured it against the labelled faults. Each service
+logs only ~4 lines a minute, so a single background error looks like a fault:
+precision was 0.05–0.4 depending on settings. Isolation Forest on the error
+count *alone* did better than on all five features, because the extra features
+mostly add noise at this volume.
+
+A plain rule – *too many errors in the last 5 minutes* – did far better. It was
+turned into the `error_burst` detector, with a threshold that scales with each
+service's normal error level instead of a hard-coded count.
+
+Preliminary numbers on 10 synthetic runs (40 faults) **not used for tuning**:
+
+| Detector | Precision | Recall | F1 | Time to first alert |
+|---|---|---|---|---|
+| `error_burst` | 0.95 | 0.82 | 0.88 | ~3.8 min |
+| `iforest` (5 features) | 0.43 | 0.90 | 0.58 | ~3.0 min |
+
+Phase 3 turns this into a reproducible `run_eval.py` report.
+
+**Decision:** keep both. `error_burst` is the bar; Isolation Forest stays as the
+comparison and because it can, in principle, catch failures that don't raise
+errors (e.g. a new log pattern). The LSTM autoencoder has to beat
+`error_burst`, not just Isolation Forest, to justify its complexity.
+
+**Trade-off:** `error_burst` only sees errors. A failure that shows up as
+silence or as new non-error messages is invisible to it.
+
+### 4.10 One anomaly per incident, written idempotently
+- **Merge:** consecutive flagged minutes (allowing one quiet minute) become a
+  single anomaly with the run's peak score. Otherwise a 10-minute fault would
+  become 10 anomalies, 10 incidents and 10 LLM calls.
+- **Upsert:** anomalies are unique on `(detector, service, window_start)`.
+  Re-running detection updates rows instead of duplicating them, and an
+  existing anomaly's end and score only ever grow, so a later run over a
+  shorter range can't cut it short. Postgres's `xmax = 0` tells inserts from
+  updates, so only genuinely new anomalies queue triage.
+- **Warm-up:** in the first minutes of a series every template is "new", which
+  looks like a bad deploy. Those windows are used for fitting, never reported.
+- **Complete windows only:** the scheduled run stops at the last full minute;
+  a half-filled current minute would look like a traffic drop.
 
 ## 5. Data model
 
@@ -231,7 +277,9 @@ once before starting the API workers, so they can't race to create tables.
 | A DB commit fails after the API already said "ingested: 10 000" | Ingest commits *before* returning; the session dependency no longer auto-commits after the response |
 | One malformed line fails the whole batch | The parser rejects bad lines individually and they're counted in `errors` |
 | `/ingest` used to read arbitrary server files (`/etc/passwd`, `.env`) and serve them back via `/events` | `file_path` must resolve inside `INGEST_ROOT`; traversal → 403 |
+| Duplicate anomalies when detection re-runs | Unique `(detector, service, window_start)` + upsert |
 | Duplicate incidents if a triage task retries | `incidents.anomaly_id` is unique; task is idempotent |
+| Celery task can't reach the database | Retries 3× with a 30 s delay; each run uses its own unpooled engine, since asyncpg connections can't cross event loops |
 | LLM outage or rate limit | Celery retries with backoff, then falls back to a non-LLM summary |
 | Dead WebSocket clients pile up | Removed in a `finally` block and on failed send |
 | Secrets in the repo | `.env` is git-ignored; only `.env.example` is committed |
@@ -255,9 +303,9 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 | Phase | Deliverable | Why this order |
 |---|---|---|
 | 0–1 ✅ | Skeleton, parser, storage, generator | Foundation |
-| 2 | Detection task writes `anomalies` per service | First real output |
+| 2 ✅ | Detection writes `anomalies` per service (API + scheduled task) | First real output |
 | 3 | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
 | 4 | RAG + LLM triage | The "wow" feature, now measurable |
 | 5 | Dashboard + Redis-backed WebSocket | Makes it demoable |
-| 6 | LSTM autoencoder vs. Isolation Forest table | The ML comparison story |
+| 6 | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
 | 7 | Hosted demo + screenshots + metrics in README | What a reviewer sees first |

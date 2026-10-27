@@ -16,7 +16,9 @@ class IForestDetector(Detector):
 
     def __init__(
         self,
-        contamination: float = 0.05,
+        # Expected share of anomalous windows. 0.01 scored best on the labelled
+        # synthetic faults; higher values mostly add false positives.
+        contamination: float = 0.01,
         n_estimators: int = 200,
         random_state: int = 42,
     ) -> None:

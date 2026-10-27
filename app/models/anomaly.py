@@ -2,7 +2,7 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, func
+from sqlalchemy import Boolean, DateTime, Float, Integer, String, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -18,7 +18,7 @@ class Anomaly(Base):
         DateTime(timezone=True), server_default=func.now(), index=True
     )
     detector: Mapped[str] = mapped_column(
-        String(64), nullable=False, comment="iforest | lstm_ae"
+        String(64), nullable=False, comment="error_burst | iforest | lstm_ae"
     )
     score: Mapped[float] = mapped_column(Float, nullable=False)
     window_start: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
@@ -26,6 +26,17 @@ class Anomaly(Base):
     service: Mapped[str | None] = mapped_column(String(128), nullable=True, index=True)
     is_true_positive: Mapped[bool | None] = mapped_column(
         Boolean, nullable=True, comment="filled during evaluation"
+    )
+
+    __table_args__ = (
+        # Re-running detection over the same period updates rows instead of duplicating them
+        UniqueConstraint(
+            "detector",
+            "service",
+            "window_start",
+            name="uq_anomalies_detector_service_window",
+            postgresql_nulls_not_distinct=True,
+        ),
     )
 
     def __repr__(self) -> str:

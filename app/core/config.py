@@ -38,6 +38,11 @@ class Settings(BaseSettings):
     # /ingest may only read files under this directory
     ingest_root: str = "data"
 
+    # ── Detection schedule ───────────────────────────
+    detection_interval_seconds: int = 300
+    # Each run refits on this much history, so it must cover many normal windows
+    detection_lookback_minutes: int = 360
+
 
 @lru_cache
 def get_settings() -> Settings:

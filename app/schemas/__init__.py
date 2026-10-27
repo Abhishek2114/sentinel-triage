@@ -1,6 +1,7 @@
 """Pydantic request/response schemas."""
 
 from datetime import datetime
+from typing import Literal, get_args
 
 from pydantic import BaseModel, Field
 
@@ -43,6 +44,30 @@ class AnomalyRead(BaseModel):
     is_true_positive: bool | None = None
 
     model_config = {"from_attributes": True}
+
+
+DetectorName = Literal["error_burst", "iforest"]
+
+
+class DetectRequest(BaseModel):
+    """Request body for running detection on stored events."""
+
+    service: str | None = Field(None, description="Only this service (default: all)")
+    since: datetime | None = Field(None, description="Inclusive lower bound (default: all)")
+    until: datetime | None = Field(None, description="Exclusive upper bound (default: all)")
+    window_minutes: int = Field(1, ge=1, le=60)
+    detectors: list[DetectorName] = Field(
+        default_factory=lambda: list(get_args(DetectorName)), min_length=1
+    )
+
+
+class DetectResponse(BaseModel):
+    """Result of a detection run."""
+
+    services: list[str]
+    windows_scored: int
+    new_anomalies: int
+    anomalies: list[AnomalyRead]
 
 
 # ── Incident ──────────────────────────────────────────

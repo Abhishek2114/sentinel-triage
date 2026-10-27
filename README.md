@@ -25,7 +25,7 @@ flowchart LR
     A["Raw logs<br/>ISO / syslog / JSON"] --> B["Parse +<br/>template"]
     B --> C[("PostgreSQL")]
     C --> D["Per-service<br/>1-min features"]
-    D --> E["Anomaly detection<br/>Isolation Forest / LSTM-AE"]
+    D --> E["Anomaly detection<br/>error-burst baseline / Isolation Forest / LSTM-AE"]
     E --> F["Triage<br/>runbook RAG + LLM"]
     F --> G["Incident<br/>REST + live WebSocket"]
     E --> H["Evaluation<br/>precision / recall / MTTD"]
@@ -37,7 +37,9 @@ flowchart LR
 3. **Featurize.** Per service and per minute: event count, error count/rate, distinct templates, and
    *new* templates never seen before (the signature of a bad deploy).
 4. **Detect.** Pluggable detectors behind one interface (`fit / score / detect`, higher score = more
-   anomalous): an Isolation Forest baseline, and an LSTM autoencoder to compare against it.
+   anomalous), fitted per service: a statistical **error-burst** baseline, **Isolation Forest**, and
+   (next) an **LSTM autoencoder**. Consecutive flagged minutes merge into one anomaly, and re-runs
+   update rows instead of duplicating them. Runs on demand (`POST /detect`) or every 5 minutes (Celery beat).
 5. **Triage.** For each anomaly, retrieve the matching runbook sections (pgvector) and the relevant
    log lines, and ask an LLM for a structured summary, root cause and next steps.
 6. **Serve.** Incidents are stored, exposed through a REST API and pushed live to a dashboard.
@@ -52,7 +54,7 @@ flowchart LR
 |-------|-------------|--------|
 | 0. Skeleton | FastAPI, Docker Compose, CI (lint, strict typing, tests, migrations) | ✅ |
 | 1. Ingest | Parser, templating, Postgres storage, labelled synthetic log generator | ✅ |
-| 2. Detect | Per-service features ✅, Isolation Forest ✅, scheduled detection task writing `anomalies` | 🚧 |
+| 2. Detect | Per-service features, error-burst baseline + Isolation Forest, `POST /detect`, scheduled Celery task, idempotent `anomalies` upserts | ✅ |
 | 3. Eval | `run_eval.py` reports precision, recall, MTTD per detector | 🔲 |
 | 4. Triage | Runbook RAG + LLM summaries via Celery | 🔲 |
 | 5. Live UI | React dashboard, Redis-backed WebSocket alerts | 🔲 |
@@ -65,6 +67,7 @@ flowchart LR
 
 | Detector | Precision | Recall | MTTD |
 |---|---|---|---|
+| Error-burst baseline | – | – | – |
 | Isolation Forest | – | – | – |
 | LSTM autoencoder | – | – | – |
 
@@ -94,6 +97,10 @@ curl -X POST http://localhost:8000/api/v1/ingest \
 
 # 7. Query events
 curl "http://localhost:8000/api/v1/events?service=api-gateway&level=ERROR"
+
+# 8. Detect anomalies, then compare them with data/synthetic/labels.jsonl
+curl -X POST http://localhost:8000/api/v1/detect -H "Content-Type: application/json" -d '{}'
+curl "http://localhost:8000/api/v1/anomalies?detector=error_burst"
 ```
 
 Everything in containers (API runs migrations on start):
@@ -109,7 +116,8 @@ docker compose up --build
 | `GET` | `/api/v1/health` | Liveness check, including database connectivity |
 | `POST` | `/api/v1/ingest` | Ingest raw `lines` or a `file_path` under `data/` |
 | `GET` | `/api/v1/events` | Query logs (filter by service, level, time range) |
-| `GET` | `/api/v1/anomalies` | List detected anomalies |
+| `POST` | `/api/v1/detect` | Run detection now (optional `service`, `since`, `until`, `detectors`) |
+| `GET` | `/api/v1/anomalies` | List detected anomalies (filter by detector, service) |
 | `GET` | `/api/v1/incidents` | List triaged incidents |
 | `GET` | `/api/v1/incidents/{id}` | Incident detail with linked anomaly and log lines |
 | `WS` | `/api/v1/ws/alerts` | Live incident stream |
@@ -126,7 +134,7 @@ Redis · **Async work:** Celery · **ML:** scikit-learn, PyTorch (LSTM-AE), sent
 app/
   api/        REST + WebSocket routes
   ingest/     parser, templating, file reader
-  detect/     features, detector interface, Isolation Forest, LSTM-AE
+  detect/     features, detectors (error-burst, Isolation Forest, LSTM-AE), pipeline
   rag/        runbook chunking, retrieval, LLM summarizer
   workers/    Celery app and tasks
   models/     SQLAlchemy ORM models
@@ -139,7 +147,7 @@ docs/         design document
 ## Development
 
 ```bash
-pytest --cov=app                          # tests
+pytest --cov=app                          # tests (DB tests skip without Postgres)
 ruff check app/ tests/ scripts/ migrations/   # lint
 mypy app/ --ignore-missing-imports        # strict type check
 alembic upgrade head                      # apply migrations
