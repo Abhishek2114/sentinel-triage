@@ -2,7 +2,7 @@
 
 **Turns a flood of application logs into a short, evidence-backed incident report: what broke, where, why, and which runbook to follow.**
 
-[![CI](https://github.com/<your-username>/sentinel-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/<your-username>/sentinel-triage/actions/workflows/ci.yml)
+[![CI](https://github.com/Abhishek2114/sentinel-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek2114/sentinel-triage/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 
 > **The problem.** During an outage, on-call engineers scroll through thousands of log lines a
