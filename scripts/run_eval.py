@@ -36,7 +36,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.detect.pipeline import DEFAULT_DETECTORS, DETECTORS  # noqa: E402
 from app.eval.harness import RunbookIndex, evaluate_run  # noqa: E402
-from app.eval.metrics import DetectorReport, RetrievalReport  # noqa: E402
+from app.eval.metrics import DetectorReport, IncidentReport, RetrievalReport  # noqa: E402
 from app.rag.embeddings import HASHING, get_embedder  # noqa: E402
 from app.rag.ingest_docs import load_runbooks  # noqa: E402
 from scripts.generate_logs import generate_logs  # noqa: E402
@@ -102,6 +102,20 @@ def retrieval_table(report: RetrievalReport) -> str:
     for ft, (hit, total) in sorted(report.by_fault_type.items()):
         rows.append(f"| {ft} | {hit}/{total} |")
     rows.append(f"| **All** | **{report.hit_rate:.0%}** ({report.evaluated} faults) |")
+    return "\n".join(rows)
+
+
+def incidents_table(reports: list[IncidentReport]) -> str:
+    """Incidents the triaged detector would open, without and with grouping."""
+    rows = [
+        "| Grouping | Incidents | Per caught fault | Duplicates | Merged faults | False |",
+        "|---|---|---|---|---|---|",
+    ]
+    for r in reports:
+        rows.append(
+            f"| {r.grouping} | {r.incidents} | {r.per_caught_fault:.2f} | {r.duplicates} "
+            f"| {r.merged} | {r.false_incidents} |"
+        )
     return "\n".join(rows)
 
 
@@ -181,6 +195,7 @@ def main() -> None:
 
     totals = {name: DetectorReport(detector=name) for name in args.detectors}
     triage_total: RetrievalReport | None = None
+    incident_totals: list[IncidentReport] = []
     per_run: list[dict[str, Any]] = []
     for run_name, lines, labels in runs:
         result_run = evaluate_run(
@@ -192,6 +207,12 @@ def main() -> None:
             "run": run_name,
             "detectors": [r.to_dict() for r in result_run.detectors.values()],
         }
+        if result_run.incidents:
+            if not incident_totals:
+                incident_totals = [IncidentReport(r.grouping) for r in result_run.incidents]
+            for total, report in zip(incident_totals, result_run.incidents, strict=True):
+                total.add(report)
+            run_entry["incidents"] = [r.to_dict() for r in result_run.incidents]
         if result_run.retrieval is not None:
             if triage_total is None:
                 triage_total = RetrievalReport(
@@ -213,6 +234,8 @@ def main() -> None:
     print(markdown_table(totals))
     if triage_total is not None:
         print("\n" + retrieval_table(triage_total))
+    if incident_totals:
+        print("\n" + incidents_table(incident_totals))
 
     result: dict[str, Any] = {
         "source": source,
@@ -221,6 +244,8 @@ def main() -> None:
     }
     if triage_total is not None:
         result["triage"] = triage_total.to_dict()
+    if incident_totals:
+        result["incidents"] = [r.to_dict() for r in incident_totals]
     result["runs"] = per_run
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")

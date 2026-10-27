@@ -1,5 +1,7 @@
 """FastAPI application factory and router registration."""
 
+import asyncio
+import contextlib
 from collections.abc import AsyncGenerator
 from contextlib import asynccontextmanager
 
@@ -11,6 +13,7 @@ from app import models  # noqa: F401  (registers all tables on Base.metadata)
 from app.core.config import get_settings
 from app.core.db import Base, engine
 from app.core.logging import get_logger, setup_logging
+from app.realtime import redis_factory, relay
 
 settings = get_settings()
 log = get_logger(__name__)
@@ -30,8 +33,19 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
             await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
             await conn.run_sync(Base.metadata.create_all)
 
+    # Forward incident events from Redis to this process's WebSocket clients
+    relay_task: asyncio.Task[None] | None = None
+    if settings.realtime_enabled:
+        from app.api.ws import broadcast
+
+        relay_task = asyncio.create_task(relay(redis_factory(settings.redis_url), broadcast))
+
     yield
 
+    if relay_task is not None:
+        relay_task.cancel()
+        with contextlib.suppress(asyncio.CancelledError):
+            await relay_task
     await engine.dispose()
     log.info("shutdown_complete")
 

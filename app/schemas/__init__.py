@@ -42,6 +42,7 @@ class AnomalyRead(BaseModel):
     window_end: datetime
     service: str | None = None
     is_true_positive: bool | None = None
+    incident_id: int | None = None
 
     model_config = {"from_attributes": True}
 
@@ -73,6 +74,9 @@ class DetectResponse(BaseModel):
 # ── Incident ──────────────────────────────────────────
 
 
+IncidentStatus = Literal["open", "resolved"]
+
+
 class EvidencePattern(BaseModel):
     """A log pattern ranked as unusual during the anomaly."""
 
@@ -89,7 +93,11 @@ class IncidentRead(BaseModel):
     """Schema for incident responses."""
 
     id: int
-    anomaly_id: int
+    anomaly_id: int = Field(description="The anomaly that opened the incident")
+    service: str | None = None
+    started_at: datetime
+    last_seen_at: datetime
+    anomaly_count: int = Field(description="Anomalies grouped into this incident")
     summary: str
     root_cause: str | None = None
     confidence: Literal["low", "medium", "high"] | None = None
@@ -99,17 +107,23 @@ class IncidentRead(BaseModel):
     related_event_ids: list[int] | None = None
     triage_method: Literal["llm", "fallback"]
     llm_model: str | None = None
-    status: str
+    status: IncidentStatus
     created_at: datetime
+    updated_at: datetime
 
     model_config = {"from_attributes": True}
 
 
 class IncidentDetail(IncidentRead):
-    """Incident with linked anomaly data."""
+    """Incident with its grouped anomalies and evidence log lines."""
 
     anomaly: AnomalyRead | None = None
+    anomalies: list[AnomalyRead] = Field(default_factory=list)
     related_events: list[LogEventRead] | None = None
+
+
+class IncidentUpdate(BaseModel):
+    status: IncidentStatus
 
 
 class RunbookIndexResponse(BaseModel):

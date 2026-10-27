@@ -1,36 +1,32 @@
 """Triage endpoints – turn an anomaly into an incident, (re)index runbooks."""
 
-import asyncio
+from datetime import timedelta
 
 from fastapi import APIRouter, Depends, HTTPException, Response, status
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.api.deps import get_embedder_dep, get_llm_dep, get_redis_factory
 from app.core.config import get_settings
 from app.core.db import get_session
 from app.models.incident import Incident
-from app.rag.embeddings import Embedder, get_embedder
+from app.rag.embeddings import Embedder
 from app.rag.index import index_runbooks
-from app.rag.summarizer import LLMClient, llm_from_settings
+from app.rag.summarizer import LLMClient
+from app.realtime import RedisFactory, publish_incident
 from app.schemas import IncidentRead, RunbookIndexResponse
 from app.triage.service import triage
 
 router = APIRouter(tags=["triage"])
 
 
-async def get_embedder_dep() -> Embedder:
-    # The first call loads the model (seconds); keep it off the event loop
-    return await asyncio.to_thread(get_embedder, get_settings().embedding_model)
-
-
-def get_llm_dep() -> LLMClient | None:
-    return llm_from_settings(get_settings())
-
-
 @router.post(
     "/anomalies/{anomaly_id}/triage",
     response_model=IncidentRead,
-    responses={200: {"description": "Incident already existed"}, 201: {"description": "Created"}},
+    responses={
+        200: {"description": "Joined an open incident, or was already triaged"},
+        201: {"description": "Opened a new incident"},
+    },
 )
 async def triage_anomaly(
     anomaly_id: int,
@@ -38,18 +34,32 @@ async def triage_anomaly(
     session: AsyncSession = Depends(get_session),
     embedder: Embedder = Depends(get_embedder_dep),
     llm: LLMClient | None = Depends(get_llm_dep),
+    redis: RedisFactory = Depends(get_redis_factory),
 ) -> Incident:
     """Triage one anomaly now and return its incident.
 
-    Idempotent: an anomaly has at most one incident, so calling this again
-    returns the existing one (200) instead of making another LLM call.
+    If an open incident on the same service is close in time, the anomaly
+    joins it (no LLM call). Idempotent: triaging again returns the same incident.
     """
     try:
-        outcome = await triage(session, anomaly_id, embedder=embedder, llm=llm)
+        outcome = await triage(
+            session,
+            anomaly_id,
+            embedder=embedder,
+            llm=llm,
+            group_gap=timedelta(minutes=get_settings().incident_group_minutes),
+        )
     except LookupError as exc:
         raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    if outcome.event is not None:
+        await publish_incident(session, redis, outcome.incident_id, outcome.event)
     response.status_code = status.HTTP_201_CREATED if outcome.created else status.HTTP_200_OK
-    incident = await session.scalar(select(Incident).where(Incident.id == outcome.incident_id))
+    incident = await session.scalar(
+        select(Incident)
+        .where(Incident.id == outcome.incident_id)
+        .execution_options(populate_existing=True)  # grouping updated it with UPDATE
+    )
     assert incident is not None
     return incident
 

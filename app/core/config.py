@@ -52,6 +52,13 @@ class Settings(BaseSettings):
     # Only these detectors' anomalies become incidents. Isolation Forest raises
     # ~34 false alarms a day (README results), so it isn't triaged by default.
     triage_detectors: list[str] = ["error_burst"]
+    # A triaged anomaly joins an open incident on the same service if it starts
+    # within this many minutes of it, instead of opening a new incident
+    incident_group_minutes: int = 15
+
+    # ── Live alerts ──────────────────────────────────
+    # API processes relay incident events from Redis to WebSocket clients
+    realtime_enabled: bool = True
 
 
 @lru_cache

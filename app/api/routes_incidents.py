@@ -1,15 +1,24 @@
 """Incident and anomaly query endpoints."""
 
 from fastapi import APIRouter, Depends, HTTPException, Query
-from sqlalchemy import select
+from sqlalchemy import func, select, update
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import joinedload
+from sqlalchemy.orm import selectinload
 
+from app.api.deps import get_redis_factory
 from app.core.db import get_session
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
-from app.schemas import AnomalyRead, IncidentDetail, IncidentRead, LogEventRead
+from app.realtime import RedisFactory, publish_incident
+from app.schemas import (
+    AnomalyRead,
+    IncidentDetail,
+    IncidentRead,
+    IncidentStatus,
+    IncidentUpdate,
+    LogEventRead,
+)
 
 router = APIRouter(tags=["incidents"])
 
@@ -41,18 +50,30 @@ async def list_anomalies(
 
 @router.get("/incidents", response_model=list[IncidentRead])
 async def list_incidents(
-    status: str | None = Query(None),
+    status: IncidentStatus | None = Query(None),
+    service: str | None = Query(None),
     limit: int = Query(100, ge=1, le=1000),
     offset: int = Query(0, ge=0),
     session: AsyncSession = Depends(get_session),
 ) -> list[Incident]:
-    """List triaged incidents."""
-    stmt = select(Incident).order_by(Incident.created_at.desc())
+    """List incidents, most recently active first."""
+    stmt = select(Incident).order_by(Incident.last_seen_at.desc(), Incident.id.desc())
     if status:
         stmt = stmt.where(Incident.status == status)
+    if service:
+        stmt = stmt.where(Incident.service == service)
     stmt = stmt.offset(offset).limit(limit)
     result = await session.execute(stmt)
     return list(result.scalars().all())
+
+
+async def _load_incident(session: AsyncSession, incident_id: int) -> Incident:
+    incident = await session.scalar(
+        select(Incident).options(selectinload(Incident.anomalies)).where(Incident.id == incident_id)
+    )
+    if incident is None:
+        raise HTTPException(status_code=404, detail="Incident not found")
+    return incident
 
 
 @router.get("/incidents/{incident_id}", response_model=IncidentDetail)
@@ -60,19 +81,9 @@ async def get_incident(
     incident_id: int,
     session: AsyncSession = Depends(get_session),
 ) -> IncidentDetail:
-    """Get a single incident with its linked anomaly and related log events."""
-    stmt = (
-        select(Incident)
-        .options(joinedload(Incident.anomaly))
-        .where(Incident.id == incident_id)
-    )
-    result = await session.execute(stmt)
-    incident = result.scalar_one_or_none()
+    """An incident with its grouped anomalies and the log lines it cites."""
+    incident = await _load_incident(session, incident_id)
 
-    if incident is None:
-        raise HTTPException(status_code=404, detail="Incident not found")
-
-    # Fetch related events if IDs are present
     related_events: list[LogEvent] = []
     if incident.related_event_ids:
         evt_stmt = (
@@ -86,3 +97,28 @@ async def get_incident(
     detail = IncidentDetail.model_validate(incident)
     detail.related_events = [LogEventRead.model_validate(e) for e in related_events]
     return detail
+
+
+@router.patch("/incidents/{incident_id}", response_model=IncidentRead)
+async def update_incident(
+    incident_id: int,
+    body: IncidentUpdate,
+    session: AsyncSession = Depends(get_session),
+    redis: RedisFactory = Depends(get_redis_factory),
+) -> Incident:
+    """Resolve or reopen an incident. Resolved incidents no longer absorb new anomalies."""
+    incident = await _load_incident(session, incident_id)
+    if incident.status != body.status:
+        await session.execute(
+            update(Incident)
+            .where(Incident.id == incident_id)
+            .values(status=body.status, updated_at=func.now())
+        )
+        await session.commit()
+        await publish_incident(session, redis, incident_id, "incident.updated")
+    # populate_existing: the session already holds this row with the old status
+    refreshed = await session.scalar(
+        select(Incident).where(Incident.id == incident_id).execution_options(populate_existing=True)
+    )
+    assert refreshed is not None
+    return refreshed

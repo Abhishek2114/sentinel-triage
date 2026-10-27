@@ -77,14 +77,14 @@ services:
       redis:
         condition: service_healthy
 
-  # ── React dashboard (dev server) ──────────────────
-  # Opt-in until the dashboard is built (Phase 5):
-  #   docker compose --profile dashboard up
+  # ── React dashboard (dev server, http://localhost:5173) ──
   dashboard:
-    profiles: ["dashboard"]
     build:
       context: ./dashboard
       dockerfile: Dockerfile
+    environment:
+      # Vite proxies /api (REST + WebSocket) to the API container
+      API_TARGET: http://api:8000
     ports:
       - "5173:5173"
     depends_on:

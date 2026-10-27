@@ -44,8 +44,11 @@ flowchart LR
    before, use the top ones to retrieve the right runbook (pgvector), then have an LLM write a
    structured report. Every claim is checked against what it was shown, and with no LLM a rule-based
    report is written instead.
-6. **Serve.** Incidents are stored, exposed through a REST API and pushed live to a dashboard.
-7. **Evaluate.** The log generator injects four labelled fault types (CPU spike, DB connection
+6. **Group.** A fault that flaps (flagged, quiet for a few minutes, flagged again) joins the open
+   incident on that service instead of opening another one, so one fault is one page and one LLM call.
+7. **Serve.** Incidents are exposed through a REST API and pushed live to a React dashboard: whoever
+   changes an incident publishes to Redis, and every API process relays it to its WebSocket clients.
+8. **Evaluate.** The log generator injects four labelled fault types (CPU spike, DB connection
    failure, bad deploy, memory leak), so each detector gets precision, recall and mean time to detect.
 
 👉 **Design decisions, trade-offs and the scaling path are in [docs/DESIGN.md](docs/DESIGN.md).**
@@ -59,7 +62,7 @@ flowchart LR
 | 2. Detect | Per-service features, error-burst baseline + Isolation Forest, `POST /detect`, scheduled Celery task, idempotent `anomalies` upserts | ✅ |
 | 3. Eval | Reproducible `run_eval.py`: precision, recall, F1, MTTD, false alarms/day, per-fault-type recall | ✅ |
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
-| 5. Live UI | React dashboard, Redis-backed WebSocket alerts | 🔲 |
+| 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
 | 6. Second model | LSTM autoencoder vs. Isolation Forest comparison | 🔲 |
 | 7. Deploy | Hosted demo, screenshots | 🔲 |
 
@@ -106,6 +109,13 @@ detector whose anomalies are triaged by default):
 This checks the deterministic part of triage (which log lines, which runbook) with the offline
 embedder, so it reproduces without downloading a model. The LLM's prose has no labelled ground truth,
 which is why its output is structured and checked instead ([DESIGN.md §4.8](docs/DESIGN.md)).
+
+**One fault, one incident.** Grouping anomalies that are within 15 minutes on the same service:
+
+| | Incidents | Per caught fault | Duplicate incidents | Two faults merged into one |
+|---|---|---|---|---|
+| No grouping | 197 | 1.12 | 20 | 0 |
+| 15-minute grouping | 176 | **1.00** | **0** | **0** |
 
 **How it's measured.** A fault counts as detected if an anomaly on the *same service* overlaps its
 window. An anomaly that overlaps no fault is a false alarm, including one on the wrong service.
@@ -183,11 +193,22 @@ An incident (no LLM configured; trimmed):
 }
 ```
 
-Everything in containers (API runs migrations on start):
+Everything in containers (API runs migrations on start, the worker indexes runbooks), with the
+dashboard at http://localhost:5173:
 
 ```bash
 docker compose up --build
 ```
+
+Or run the dashboard against a local API (`uvicorn` from step 5):
+
+```bash
+cd dashboard && npm install && npm run dev   # http://localhost:5173, proxies /api to :8000
+```
+
+The dashboard shows a timeline of anomalies and incidents per service, the incident list (open /
+resolved), and each incident's summary, next steps, ranked evidence and log lines. New and grouped
+incidents arrive over the WebSocket without a reload; on reconnect it refetches, so nothing is missed.
 
 ## API (v1)
 
@@ -198,16 +219,17 @@ docker compose up --build
 | `GET` | `/api/v1/events` | Query logs (filter by service, level, time range) |
 | `POST` | `/api/v1/detect` | Run detection now (optional `service`, `since`, `until`, `detectors`) |
 | `GET` | `/api/v1/anomalies` | List detected anomalies (filter by detector, service) |
-| `POST` | `/api/v1/anomalies/{id}/triage` | Create (201) or return (200) the anomaly's incident |
+| `POST` | `/api/v1/anomalies/{id}/triage` | Open a new incident (201), or join an open one / return the existing one (200) |
 | `POST` | `/api/v1/runbooks/index` | Re-embed the runbooks into pgvector |
-| `GET` | `/api/v1/incidents` | List triaged incidents |
-| `GET` | `/api/v1/incidents/{id}` | Incident detail with linked anomaly and log lines |
-| `WS` | `/api/v1/ws/alerts` | Live incident stream |
+| `GET` | `/api/v1/incidents` | List incidents, most recently active first (filter by status, service) |
+| `GET` | `/api/v1/incidents/{id}` | Incident detail with grouped anomalies and log lines |
+| `PATCH` | `/api/v1/incidents/{id}` | Resolve or reopen (`{"status": "resolved"}`) |
+| `WS` | `/api/v1/ws/alerts` | Live `incident.created` / `incident.updated` events |
 
 ## Tech stack
 
 **API:** FastAPI, Pydantic v2, SQLAlchemy 2 (async), Alembic · **Data:** PostgreSQL + pgvector,
-Redis · **Async work:** Celery · **ML:** scikit-learn, PyTorch (LSTM-AE), sentence-transformers ·
+Redis (pub/sub) · **Async work:** Celery · **UI:** React 18, TypeScript, Vite, Vitest · **ML:** scikit-learn, PyTorch (LSTM-AE), sentence-transformers ·
 **Quality:** pytest, ruff, mypy `--strict`, GitHub Actions · **Ops:** Docker Compose, structlog
 
 ## Project layout
@@ -218,10 +240,12 @@ app/
   ingest/     parser, templating, file reader
   detect/     features, detectors (error-burst, Isolation Forest, LSTM-AE), pipeline
   eval/       match anomalies to labelled faults, precision / recall / MTTD
-  triage/     evidence ranking (lift vs. the previous hour), anomaly → incident
+  triage/     evidence ranking (lift vs. the previous hour), grouping, anomaly → incident
   rag/        runbook sections, embeddings, pgvector retrieval, LLM report + fallback
   workers/    Celery app and tasks
   models/     SQLAlchemy ORM models
+  realtime.py Redis pub/sub publisher and relay to WebSocket clients
+dashboard/    React + TypeScript dashboard (Vite)
 scripts/      synthetic log generator, run_eval.py
 eval/results  committed evaluation report (heldout.json)
 data/runbooks Markdown runbooks used for retrieval
@@ -236,6 +260,7 @@ pytest --cov=app                          # tests (DB tests skip without Postgre
 ruff check app/ tests/ scripts/ migrations/   # lint
 mypy app/ --ignore-missing-imports        # strict type check
 alembic upgrade head                      # apply migrations
+cd dashboard && npm run typecheck && npm test   # dashboard
 ```
 
 ## License

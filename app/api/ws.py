@@ -1,7 +1,8 @@
-"""WebSocket endpoint for live incident alerts."""
+"""WebSocket endpoint for live incident alerts.
 
-import json
-from typing import Any
+Each API process keeps its own set of sockets. Events reach them through
+``app.realtime.relay``, which forwards the Redis channel to ``broadcast``.
+"""
 
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
@@ -10,9 +11,7 @@ from app.core.logging import get_logger
 router = APIRouter(tags=["websocket"])
 log = get_logger(__name__)
 
-# In-memory set of connected clients. This only reaches clients connected to
-# *this* process; Celery workers and other uvicorn workers need a shared
-# channel (e.g. Redis pub/sub) to push incidents here.
+# Clients connected to *this* process
 _connections: set[WebSocket] = set()
 
 
@@ -35,12 +34,11 @@ async def alert_stream(websocket: WebSocket) -> None:
         log.info("ws_client_disconnected", total=len(_connections))
 
 
-async def broadcast_incident(incident_data: dict[str, Any]) -> None:
-    """Push an incident payload to all connected WebSocket clients."""
+async def broadcast(payload: str) -> None:
+    """Send an already-serialised event to every client of this process."""
     if not _connections:
         return
 
-    payload = json.dumps(incident_data, default=str)
     dead: list[WebSocket] = []
 
     # Iterate over a snapshot: clients can connect/disconnect while we await send

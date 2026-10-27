@@ -30,7 +30,7 @@ answers all four, and measures how well it does it.**
 | Functional | Ingest logs in ISO, syslog and JSON formats | `app/ingest/parser.py` |
 | Functional | Detect anomalous time windows per service | Template features + error-burst baseline / Isolation Forest (`app/detect/`) |
 | Functional | Explain each anomaly with evidence and a runbook | Lift-ranked evidence + pgvector runbook retrieval + optional LLM (`app/triage/`, `app/rag/`) |
-| Functional | Push incidents to a live dashboard | WebSocket (`app/api/ws.py`) |
+| Functional | Push incidents to a live dashboard | Redis pub/sub → WebSocket (`app/realtime.py`, `app/api/ws.py`), React UI (`dashboard/`) |
 | Quality | **Measurable** detection quality | Labelled synthetic faults → precision, recall, MTTD (`scripts/run_eval.py`) |
 | Latency | Mean time to detect < 2 min | 1-minute windows, async workers |
 | Cost | LLM is called only for real anomalies, once each | Triage runs per anomaly; `incidents.anomaly_id` is unique |
@@ -47,14 +47,14 @@ flowchart LR
 
     subgraph API["FastAPI (stateless)"]
         I["POST /ingest<br/>parse + template"]
-        Q["GET /events, /anomalies, /incidents"]
-        W["WS /ws/alerts"]
+        Q["GET /events, /anomalies, /incidents<br/>PATCH /incidents"]
+        W["WS /ws/alerts<br/>relay per process"]
     end
 
     subgraph Workers["Celery workers"]
         B["beat<br/>every 5 min"]
         D["detect_anomalies<br/>per service, per minute"]
-        T["triage_anomaly<br/>RAG + LLM"]
+        T["triage_anomaly<br/>group or RAG + LLM"]
     end
 
     PG[("PostgreSQL<br/>+ pgvector")]
@@ -71,9 +71,10 @@ flowchart LR
     D -->|enqueue| R --> T
     T -->|runbook chunks| PG
     T -->|incident row| PG
-    T -->|publish| R
-    R -->|subscribe| W --> UI
-    Q --> UI
+    T -->|publish incident event| R
+    Q -->|publish on resolve| R
+    R -->|subscribe| W -->|push| UI
+    Q <-->|REST| UI
     PG --> E
     G -. labels .-> E
 ```
@@ -91,7 +92,8 @@ or scaled independently.
 | **Featurize** | events → per-service 1-min `WindowFeatures` | `detect/features.py` |
 | **Detect** | windows → merged `AnomalyResult`s, upserted to `anomalies` | `detect/pipeline.py` |
 | **Triage** | anomaly → lift-ranked log patterns → best runbooks (pgvector) → report (LLM or rule-based) → `Incident` | `triage/`, `rag/`, `workers/tasks.py` |
-| **Serve** | incident → REST + WebSocket push | `api/` |
+| **Group** | anomaly → joins an open incident on the same service within 15 min, or opens one | `triage/grouping.py` |
+| **Serve** | incident change → Redis → every API process → its WebSocket clients → dashboard | `realtime.py`, `api/ws.py`, `dashboard/` |
 | **Evaluate** | seeded runs → same `detect_events` → matched to labels → metrics | `eval/`, `scripts/run_eval.py` |
 
 ## 4. Key decisions
@@ -191,7 +193,19 @@ An in-memory set of sockets can't be reached from another process. The worker
 publishes to a Redis channel; each API worker subscribes and fans out to its
 own clients.
 
-*(Current code has the in-process broadcast; the Redis bridge is part of Phase 5.)*
+**How:** whoever changes an incident (the triage task, `POST /triage`,
+`PATCH /incidents`) publishes `{"type": "incident.created" | "incident.updated",
+"incident": …}` to `sentinel:incidents`. Each API process runs one relay task
+(started in the app lifespan) that subscribes and broadcasts to its own sockets,
+reconnecting with exponential backoff if Redis drops.
+
+**Delivery is best effort, by design.** Publishing never fails triage: if Redis
+is down the event is logged and dropped. The dashboard refetches the incident
+list on every (re)connect and *merges* it with what it has, keeping whichever
+copy of each incident is newer, so a missed event is recovered and a refetch
+racing a live event can't erase it (a bug the dashboard tests caught).
+Pub/sub has no replay; a durable stream (Redis Streams, Kafka) would only be
+worth it if something other than a dashboard consumed these events.
 
 ### 4.8 Triage: evidence first, the LLM last (and optional)
 Triage is four steps, and only the last one needs an LLM:
@@ -288,14 +302,37 @@ Phase 6 is meant to close.
 - **Complete windows only:** the scheduled run stops at the last full minute;
   a half-filled current minute would look like a traffic drop.
 
-### 4.11 Known limitation: one fault can become two incidents
-If the detector flags a fault, goes quiet for a few minutes, then flags it
-again, that is two anomalies and therefore two incidents (seen once in the
-smoke test: a bad deploy flagged at 03:39 and 03:44). The merge step only
-bridges a one-minute gap. The fix is incident *grouping*: attach a new anomaly
-to an open incident on the same service within N minutes instead of creating
-another. That needs an `anomalies.incident_id` link and is planned with the
-dashboard work, where it matters most.
+### 4.11 Related anomalies become one incident
+**Problem:** a fault that flaps (flagged, quiet for a few minutes, flagged
+again) produced several anomalies, and each became its own incident, LLM call
+and page. The merge step in §4.10 only bridges a one-minute gap.
+
+**Decision:** a triaged anomaly *joins* an open incident on the same service
+if it is within 15 minutes of the incident's span (`INCIDENT_GROUP_MINUTES`).
+Joining links the anomaly (`anomalies.incident_id`), widens the incident's
+`started_at` / `last_seen_at`, bumps `anomaly_count` and makes **no LLM call**.
+Resolving an incident closes it to grouping, so a recurrence opens a new one.
+
+**Concurrency:** two workers triaging anomalies for the same service at the
+same moment could both find no open incident and both open one. The
+find-or-open decision runs under a per-service Postgres advisory lock
+(`pg_advisory_xact_lock(hashtext('incident:<service>'))`), and is repeated
+after the LLM call, because another worker may have opened an incident while
+it ran (then this report is dropped and the anomaly joins). Both races have
+integration tests that run two triages concurrently.
+
+**Measured** (`run_eval.py`, 50 held-out runs, error-burst anomalies):
+
+| | Incidents | Per caught fault | Duplicates | Two faults merged |
+|---|---|---|---|---|
+| No grouping | 197 | 1.12 | 20 | 0 |
+| 15-minute grouping | 176 | 1.00 | 0 | 0 |
+
+**Trade-off:** the incident keeps the report written for its first anomaly;
+later anomalies widen the span but don't rewrite the summary. Two unrelated
+faults on one service within 15 minutes would be merged (0 of 200 here, since
+the generator spaces faults about an hour apart). Real traffic could need a
+shorter window, or grouping by root-cause pattern as well as time.
 
 ## 5. Data model
 
@@ -317,10 +354,15 @@ erDiagram
         timestamptz window_end
         string service
         bool is_true_positive
+        int incident_id FK "grouped into"
     }
     incidents {
         int id PK
-        int anomaly_id FK "unique: one incident per anomaly"
+        int anomaly_id FK "the anomaly that opened it"
+        string service
+        timestamptz started_at
+        timestamptz last_seen_at
+        int anomaly_count
         text summary
         text root_cause
         string confidence
@@ -330,7 +372,8 @@ erDiagram
         int_array related_event_ids
         string triage_method "llm | fallback"
         string llm_model
-        string status
+        string status "open | resolved"
+        timestamptz updated_at
     }
     runbook_chunks {
         int id PK
@@ -341,7 +384,7 @@ erDiagram
         string embedding_model "only compared within one model"
         vector embedding "384-d"
     }
-    anomalies ||--o| incidents : "triaged into"
+    incidents ||--|{ anomalies : "groups"
     incidents }o--o{ log_events : "evidence"
 ```
 
@@ -366,6 +409,9 @@ once before starting the API workers, so they can't race to create tables.
 | Vectors from two embedding models compared | Each chunk stores its `embedding_model`; retrieval filters on it |
 | Embedding model can't be downloaded (offline) | Falls back to the hashing embedder, logged as a warning |
 | Dead WebSocket clients pile up | Removed in a `finally` block and on failed send |
+| Redis down or restarting | Publishing logs and moves on (triage still succeeds); each API's relay reconnects with backoff; the dashboard refetches on reconnect |
+| Two workers open two incidents for one flapping fault | Per-service advisory lock around find-or-open, re-checked after the LLM call |
+| Dashboard refetch overwrites a newer live update | Fetched incidents are merged by `updated_at`, never replacing the list |
 | Secrets in the repo | `.env` is git-ignored; only `.env.example` is committed |
 | No authentication yet | Next step: API key or OAuth on all routes before any public deploy |
 
@@ -390,6 +436,6 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 | 2 ✅ | Detection writes `anomalies` per service (API + scheduled task) | First real output |
 | 3 ✅ | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
 | 4 ✅ | Evidence + runbook RAG + optional LLM triage, runbook choice measured | The "wow" feature, now measurable |
-| 5 | Dashboard + Redis-backed WebSocket | Makes it demoable |
+| 5 ✅ | Dashboard, Redis-backed live alerts, incident grouping | Makes it demoable; one fault = one incident |
 | 6 | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
 | 7 | Hosted demo + screenshots | What a reviewer sees first |

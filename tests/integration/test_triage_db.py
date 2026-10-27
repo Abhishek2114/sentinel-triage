@@ -5,7 +5,7 @@ from collections.abc import Iterator
 
 import pytest
 
-from app.api.routes_triage import get_embedder_dep, get_llm_dep
+from app.api.deps import get_embedder_dep, get_llm_dep
 from app.core.db import async_session_factory
 from app.detect.pipeline import run_detection
 from app.main import app
@@ -34,7 +34,8 @@ def no_llm() -> Iterator[None]:
     app.dependency_overrides[get_embedder_dep] = HashingEmbedder
     app.dependency_overrides[get_llm_dep] = lambda: None
     yield
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_embedder_dep, None)
+    app.dependency_overrides.pop(get_llm_dep, None)
 
 
 async def _first_anomaly(client, seed: int = 1003) -> dict:
@@ -131,7 +132,8 @@ async def test_llm_report_is_grounded_before_saving(client):
 
         incident = (await client.post(f"/api/v1/anomalies/{anomaly['id']}/triage")).json()
     finally:
-        app.dependency_overrides.clear()
+        app.dependency_overrides.pop(get_embedder_dep, None)
+        app.dependency_overrides.pop(get_llm_dep, None)
 
     assert llm.calls == 1
     assert incident["triage_method"] == "llm"

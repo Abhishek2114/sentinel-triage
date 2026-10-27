@@ -155,6 +155,26 @@
       }
     ]
   },
+  "incidents": [
+    {
+      "grouping": "none",
+      "incidents": 197,
+      "faults_caught": 171,
+      "incidents_per_caught_fault": 1.117,
+      "duplicates": 20,
+      "merged": 0,
+      "false_incidents": 6
+    },
+    {
+      "grouping": "15 min",
+      "incidents": 176,
+      "faults_caught": 171,
+      "incidents_per_caught_fault": 1.0,
+      "duplicates": 0,
+      "merged": 0,
+      "false_incidents": 5
+    }
+  ],
   "runs": [
     {
       "run": "seed 1000",
@@ -222,6 +242,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
         }
       ],
       "triage": {
@@ -314,6 +354,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -394,6 +454,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -486,6 +566,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -566,6 +666,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -650,6 +770,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -732,6 +872,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -812,6 +972,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -904,6 +1084,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -986,6 +1186,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1054,6 +1274,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -1142,6 +1382,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1228,6 +1488,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1308,6 +1588,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
         }
       ],
       "triage": {
@@ -1396,6 +1696,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1476,6 +1796,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -1560,6 +1900,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1632,6 +1992,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -1718,6 +2098,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -1814,6 +2214,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -1894,6 +2314,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -1986,6 +2426,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2072,6 +2532,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2154,6 +2634,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2234,6 +2734,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -2326,6 +2846,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2412,6 +2952,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2494,6 +3054,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2570,6 +3150,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -2662,6 +3262,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -2746,6 +3366,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -2836,6 +3476,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -2932,6 +3592,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3008,6 +3688,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.667,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -3100,6 +3800,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3180,6 +3900,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -3268,6 +4008,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3348,6 +4108,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -3436,6 +4216,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3516,6 +4316,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -3608,6 +4428,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3684,6 +4524,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -3770,6 +4630,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
         }
       ],
       "triage": {
@@ -3859,6 +4739,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -3935,6 +4835,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -4027,6 +4947,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -4105,6 +5045,26 @@
           }
         }
       ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
       "triage": {
         "detector": "error_burst",
         "embedder": "hashing",
@@ -4181,6 +5141,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -4263,6 +5243,26 @@
               "total": 2
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {
@@ -4349,6 +5349,26 @@
               "total": 1
             }
           }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
         }
       ],
       "triage": {

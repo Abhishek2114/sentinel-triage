@@ -10,20 +10,29 @@ from __future__ import annotations
 from collections import Counter
 from collections.abc import Iterable, Mapping, Sequence
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Any
 
 import numpy as np
 
 from app.detect.features import EventPoint
 from app.detect.pipeline import DEFAULT_DETECTORS, FoundAnomaly, detect_events
-from app.eval.metrics import DetectorReport, FaultLabel, RetrievalReport, overlaps, score_detector
+from app.eval.metrics import (
+    DetectorReport,
+    FaultLabel,
+    IncidentReport,
+    RetrievalReport,
+    overlaps,
+    score_detector,
+    score_incidents,
+)
 from app.ingest.parser import parse_line
 from app.ingest.templates import extract_template, template_id
 from app.rag.embeddings import Embedder
 from app.rag.ingest_docs import RunbookChunk
 from app.rag.retriever import rank_in_memory, rank_runbooks
 from app.triage.evidence import BASELINE_PERIOD, EvidenceEvent, build_evidence, evidence_window
+from app.triage.grouping import group_anomalies
 
 
 @dataclass(frozen=True, slots=True)
@@ -82,6 +91,8 @@ class RunbookIndex:
 class RunResult:
     detectors: dict[str, DetectorReport]
     retrieval: RetrievalReport | None = None
+    # Triaged detector's anomalies as incidents: one per anomaly vs. grouped
+    incidents: list[IncidentReport] = field(default_factory=list)
 
 
 def _score_retrieval(
@@ -120,8 +131,9 @@ def evaluate_run(
     window_minutes: int = 1,
     runbooks: RunbookIndex | None = None,
     triage_detector: str = "error_burst",
+    group_gap: timedelta = timedelta(minutes=15),
 ) -> RunResult:
-    """Evaluate every detector on one run, plus triage's runbook choice if ``runbooks``."""
+    """Evaluate every detector on one run, plus triage (runbook choice, incident grouping)."""
     parsed = _parse(lines)
     faults = [FaultLabel.from_dict(raw) for raw in labels]
     found = detect_events(_points(parsed), detectors, window_minutes)
@@ -142,8 +154,18 @@ def evaluate_run(
             for name in detectors
         }
     )
-    if runbooks is not None and triage_detector in detectors:
-        result.retrieval = _score_retrieval(
-            parsed, found.anomalies, faults, triage_detector, runbooks
-        )
+    if triage_detector in detectors:
+        triaged = [a for a in found.anomalies if a.detector == triage_detector]
+        result.incidents = [
+            score_incidents("none", [[a] for a in triaged], faults),
+            score_incidents(
+                f"{int(group_gap.total_seconds() // 60)} min",
+                group_anomalies(triaged, group_gap),
+                faults,
+            ),
+        ]
+        if runbooks is not None:
+            result.retrieval = _score_retrieval(
+                parsed, found.anomalies, faults, triage_detector, runbooks
+            )
     return result

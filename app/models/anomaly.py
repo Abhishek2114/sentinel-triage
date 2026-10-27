@@ -2,7 +2,16 @@
 
 from datetime import datetime
 
-from sqlalchemy import Boolean, DateTime, Float, Integer, String, UniqueConstraint, func
+from sqlalchemy import (
+    Boolean,
+    DateTime,
+    Float,
+    ForeignKey,
+    Integer,
+    String,
+    UniqueConstraint,
+    func,
+)
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.db import Base
@@ -27,6 +36,16 @@ class Anomaly(Base):
     is_true_positive: Mapped[bool | None] = mapped_column(
         Boolean, nullable=True, comment="filled during evaluation"
     )
+    # Several anomalies (a fault that flaps) can belong to one incident.
+    # use_alter: incidents.anomaly_id points back here, so the FKs form a cycle
+    incident_id: Mapped[int | None] = mapped_column(
+        Integer,
+        ForeignKey(
+            "incidents.id", ondelete="SET NULL", use_alter=True, name="fk_anomalies_incident_id"
+        ),
+        nullable=True,
+        index=True,
+    )
 
     __table_args__ = (
         # Re-running detection over the same period updates rows instead of duplicating them
@@ -40,7 +59,4 @@ class Anomaly(Base):
     )
 
     def __repr__(self) -> str:
-        return (
-            f"<Anomaly(id={self.id}, detector={self.detector!r}, "
-            f"score={self.score:.4f})>"
-        )
+        return f"<Anomaly(id={self.id}, detector={self.detector!r}, score={self.score:.4f})>"

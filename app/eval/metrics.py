@@ -211,3 +211,60 @@ class RetrievalReport:
                 for ft, doc in sorted(self.misses, key=lambda m: (m[0], m[1] or ""))
             ],
         }
+
+
+@dataclass
+class IncidentReport:
+    """What the on-call engineer would see: incidents, not anomalies."""
+
+    grouping: str  # e.g. "none" or "15 min"
+    incidents: int = 0
+    faults_caught: int = 0
+    # Extra incidents for a fault that already had one (the flapping problem)
+    duplicates: int = 0
+    # Incidents that overlap more than one fault (grouping went too far)
+    merged: int = 0
+    # Incidents that overlap no fault
+    false_incidents: int = 0
+
+    def add(self, other: IncidentReport) -> None:
+        self.incidents += other.incidents
+        self.faults_caught += other.faults_caught
+        self.duplicates += other.duplicates
+        self.merged += other.merged
+        self.false_incidents += other.false_incidents
+
+    @property
+    def per_caught_fault(self) -> float:
+        caught_incidents = self.incidents - self.false_incidents
+        return caught_incidents / self.faults_caught if self.faults_caught else 0.0
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "grouping": self.grouping,
+            "incidents": self.incidents,
+            "faults_caught": self.faults_caught,
+            "incidents_per_caught_fault": round(self.per_caught_fault, 3),
+            "duplicates": self.duplicates,
+            "merged": self.merged,
+            "false_incidents": self.false_incidents,
+        }
+
+
+def score_incidents(
+    grouping: str, groups: Sequence[Sequence[FoundAnomaly]], faults: Sequence[FaultLabel]
+) -> IncidentReport:
+    """Score incidents (each a group of anomalies) against the faults."""
+    report = IncidentReport(grouping=grouping, incidents=len(groups))
+    hits_per_fault = [0] * len(faults)
+    for group in groups:
+        touched = [i for i, f in enumerate(faults) if any(overlaps(a, f) for a in group)]
+        if not touched:
+            report.false_incidents += 1
+        if len(touched) > 1:
+            report.merged += 1
+        for i in touched:
+            hits_per_fault[i] += 1
+    report.faults_caught = sum(1 for n in hits_per_fault if n)
+    report.duplicates = sum(n - 1 for n in hits_per_fault if n > 1)
+    return report

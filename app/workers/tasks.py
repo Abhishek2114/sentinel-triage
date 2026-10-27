@@ -18,6 +18,7 @@ from app.detect.pipeline import DEFAULT_DETECTORS, DetectionSummary, run_detecti
 from app.rag.embeddings import get_embedder
 from app.rag.index import index_runbooks as index_runbooks_into
 from app.rag.summarizer import llm_from_settings
+from app.realtime import publish_incident, redis_factory
 from app.triage.service import TriageOutcome, triage
 from app.workers.celery_app import celery_app
 
@@ -103,14 +104,24 @@ async def _triage(anomaly_id: int) -> TriageOutcome:
     settings = get_settings()
     embedder = await asyncio.to_thread(get_embedder, settings.embedding_model)
     async with _session() as session:
-        return await triage(
-            session, anomaly_id, embedder=embedder, llm=llm_from_settings(settings)
+        outcome = await triage(
+            session,
+            anomaly_id,
+            embedder=embedder,
+            llm=llm_from_settings(settings),
+            group_gap=timedelta(minutes=settings.incident_group_minutes),
         )
+        if outcome.event is not None:
+            # Best effort: a Redis outage is logged, never retried as a failed triage
+            await publish_incident(
+                session, redis_factory(settings.redis_url), outcome.incident_id, outcome.event
+            )
+        return outcome
 
 
 @celery_app.task(name="triage_anomaly", bind=True, max_retries=3, default_retry_delay=30)
 def triage_anomaly(self: Task, anomaly_id: int) -> dict[str, Any]:
-    """Turn one anomaly into an incident (evidence, runbooks, report).
+    """Attach one anomaly to an open incident, or open a new one, and announce it.
 
     LLM failures don't fail the task – it falls back to a rule-based report –
     so retries are only for the database being unavailable.
@@ -123,7 +134,7 @@ def triage_anomaly(self: Task, anomaly_id: int) -> dict[str, Any]:
     except (OSError, DBAPIError) as exc:
         raise self.retry(exc=exc) from exc
     return {
-        "status": "created" if outcome.created else "exists",
+        "status": outcome.action,
         "anomaly_id": anomaly_id,
         "incident_id": outcome.incident_id,
         "method": outcome.method,

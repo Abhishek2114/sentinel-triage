@@ -1,21 +1,49 @@
 """Shared test fixtures."""
 
+import json
 from collections.abc import AsyncIterator
+from typing import Any
 
 import pytest
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy import text
 
+from app.api.deps import get_redis_factory
 from app.core.db import engine
 from app.main import app
 
 
+class RecordingRedis:
+    """Stands in for Redis in API tests and remembers what was published."""
+
+    def __init__(self) -> None:
+        self.events: list[dict[str, Any]] = []
+
+    async def publish(self, channel: str, message: str) -> int:
+        self.events.append(json.loads(message))
+        return 1
+
+    def pubsub(self) -> Any:
+        raise NotImplementedError
+
+    async def aclose(self) -> None:
+        pass
+
+
 @pytest.fixture
-async def client() -> AsyncIterator[AsyncClient]:
-    """Async test client for the FastAPI app."""
+def published() -> RecordingRedis:
+    """Live events the API published during the test."""
+    return RecordingRedis()
+
+
+@pytest.fixture
+async def client(published: RecordingRedis) -> AsyncIterator[AsyncClient]:
+    """Async test client for the FastAPI app (lifespan not run, so no Redis relay)."""
+    app.dependency_overrides[get_redis_factory] = lambda: lambda: published
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+    app.dependency_overrides.pop(get_redis_factory, None)
     # Each test runs in its own event loop; pooled asyncpg connections can't
     # be reused across loops, so drop them between tests.
     await engine.dispose()
