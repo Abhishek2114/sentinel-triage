@@ -1,0 +1,84 @@
+services:
+  # ── PostgreSQL ─────────────────────────────────────
+  postgres:
+    image: pgvector/pgvector:pg16
+    environment:
+      POSTGRES_USER: sentinel
+      POSTGRES_PASSWORD: sentinel_secret
+      POSTGRES_DB: sentinel
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U sentinel"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── Redis ──────────────────────────────────────────
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+  # ── FastAPI server ─────────────────────────────────
+  api:
+    build:
+      context: .
+      target: api
+    ports:
+      - "8000:8000"
+    env_file: .env
+    environment: &container_env
+      # Inside the Compose network the hosts are service names, not localhost
+      DATABASE_URL: postgresql+asyncpg://sentinel:sentinel_secret@postgres:5432/sentinel
+      REDIS_URL: redis://redis:6379/0
+      CELERY_BROKER_URL: redis://redis:6379/1
+      CELERY_RESULT_BACKEND: redis://redis:6379/2
+      AUTO_CREATE_TABLES: "false"  # the api image runs `alembic upgrade head` instead
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  # ── Celery worker ─────────────────────────────────
+  worker:
+    build:
+      context: .
+      target: worker
+    env_file: .env
+    environment: *container_env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    volumes:
+      - ./data:/app/data
+
+  # ── React dashboard (dev server) ──────────────────
+  # Opt-in until the dashboard is built (Phase 5):
+  #   docker compose --profile dashboard up
+  dashboard:
+    profiles: ["dashboard"]
+    build:
+      context: ./dashboard
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    depends_on:
+      - api
+    volumes:
+      - ./dashboard/src:/app/src
+
+volumes:
+  pgdata:
