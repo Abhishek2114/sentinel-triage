@@ -9,7 +9,7 @@ from app.core.db import get_session
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
-from app.schemas import AnomalyRead, IncidentDetail, IncidentRead
+from app.schemas import AnomalyRead, IncidentDetail, IncidentRead, LogEventRead
 
 router = APIRouter(tags=["incidents"])
 
@@ -75,18 +75,14 @@ async def get_incident(
     # Fetch related events if IDs are present
     related_events: list[LogEvent] = []
     if incident.related_event_ids:
-        evt_stmt = select(LogEvent).where(LogEvent.id.in_(incident.related_event_ids))
+        evt_stmt = (
+            select(LogEvent)
+            .where(LogEvent.id.in_(incident.related_event_ids))
+            .order_by(LogEvent.timestamp)
+        )
         evt_result = await session.execute(evt_stmt)
         related_events = list(evt_result.scalars().all())
 
-    return IncidentDetail(
-        id=incident.id,
-        anomaly_id=incident.anomaly_id,
-        summary=incident.summary,
-        root_cause=incident.root_cause,
-        related_event_ids=incident.related_event_ids,
-        status=incident.status,
-        created_at=incident.created_at,
-        anomaly=incident.anomaly,
-        related_events=related_events,
-    )
+    detail = IncidentDetail.model_validate(incident)
+    detail.related_events = [LogEventRead.model_validate(e) for e in related_events]
+    return detail

@@ -63,6 +63,11 @@ testpaths = ["tests"]
 asyncio_mode = "auto"
 addopts = "--strict-markers -v"
 
+[tool.coverage.run]
+# SQLAlchemy's async layer runs on greenlets; without this, every line after
+# the first database await is reported as never executed
+concurrency = ["greenlet", "thread"]
+
 [tool.mypy]
 # python_version is left to the running interpreter (CI runs 3.11)
 strict = true

@@ -73,6 +73,18 @@ class DetectResponse(BaseModel):
 # ── Incident ──────────────────────────────────────────
 
 
+class EvidencePattern(BaseModel):
+    """A log pattern ranked as unusual during the anomaly."""
+
+    template: str
+    count: int
+    baseline_count: int = Field(description="Occurrences in the hour before")
+    errors: int
+    lift: float = Field(description="Rate now / rate in the hour before")
+    example: str
+    event_ids: list[int]
+
+
 class IncidentRead(BaseModel):
     """Schema for incident responses."""
 
@@ -80,7 +92,13 @@ class IncidentRead(BaseModel):
     anomaly_id: int
     summary: str
     root_cause: str | None = None
+    confidence: Literal["low", "medium", "high"] | None = None
+    runbook: str | None = None
+    next_steps: list[str] | None = None
+    evidence: list[EvidencePattern] | None = None
     related_event_ids: list[int] | None = None
+    triage_method: Literal["llm", "fallback"]
+    llm_model: str | None = None
     status: str
     created_at: datetime
 
@@ -92,6 +110,11 @@ class IncidentDetail(IncidentRead):
 
     anomaly: AnomalyRead | None = None
     related_events: list[LogEventRead] | None = None
+
+
+class RunbookIndexResponse(BaseModel):
+    chunks: int
+    embedding_model: str
 
 
 # ── Ingest ────────────────────────────────────────────

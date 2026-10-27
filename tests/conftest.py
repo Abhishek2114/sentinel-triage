@@ -31,7 +31,10 @@ async def clean_db() -> AsyncIterator[None]:
     try:
         async with engine.begin() as conn:
             await conn.execute(
-                text("TRUNCATE incidents, anomalies, log_events RESTART IDENTITY CASCADE")
+                text(
+                    "TRUNCATE incidents, anomalies, log_events, runbook_chunks "
+                    "RESTART IDENTITY CASCADE"
+                )
             )
     except Exception as exc:  # unreachable, or not migrated yet
         await engine.dispose()

@@ -5,6 +5,7 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
 
 from app import models  # noqa: F401  (registers all tables on Base.metadata)
 from app.core.config import get_settings
@@ -25,6 +26,8 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
     # create the same tables, so Docker disables this and runs `alembic upgrade head`.
     if settings.auto_create_tables:
         async with engine.begin() as conn:
+            # runbook_chunks.embedding needs pgvector (migration 0003 does the same)
+            await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
             await conn.run_sync(Base.metadata.create_all)
 
     yield
@@ -57,6 +60,7 @@ def create_app() -> FastAPI:
     from app.api.routes_health import router as health_router
     from app.api.routes_incidents import router as incidents_router
     from app.api.routes_ingest import router as ingest_router
+    from app.api.routes_triage import router as triage_router
     from app.api.ws import router as ws_router
 
     prefix = settings.api_v1_prefix
@@ -66,6 +70,7 @@ def create_app() -> FastAPI:
     app.include_router(incidents_router, prefix=prefix)
     app.include_router(ingest_router, prefix=prefix)
     app.include_router(detect_router, prefix=prefix)
+    app.include_router(triage_router, prefix=prefix)
     app.include_router(ws_router, prefix=prefix)
 
     return app

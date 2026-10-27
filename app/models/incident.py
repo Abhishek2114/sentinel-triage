@@ -1,16 +1,17 @@
 """Incident ORM model."""
 
 from datetime import datetime
+from typing import Any
 
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, func
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.db import Base
 
 
 class Incident(Base):
-    """A triaged incident linked to an anomaly, with LLM-generated summary."""
+    """A triaged anomaly: what happened, the likely cause and what to do next."""
 
     __tablename__ = "incidents"
 
@@ -23,6 +24,15 @@ class Incident(Base):
     related_event_ids: Mapped[list[int] | None] = mapped_column(
         ARRAY(Integer), nullable=True
     )
+    confidence: Mapped[str | None] = mapped_column(String(16), nullable=True)
+    runbook: Mapped[str | None] = mapped_column(String(256), nullable=True)
+    next_steps: Mapped[list[str] | None] = mapped_column(ARRAY(Text), nullable=True)
+    # The ranked log patterns the report was based on (see triage/evidence.py)
+    evidence: Mapped[list[dict[str, Any]] | None] = mapped_column(JSONB, nullable=True)
+    triage_method: Mapped[str] = mapped_column(
+        String(16), nullable=False, server_default="fallback", comment="llm | fallback"
+    )
+    llm_model: Mapped[str | None] = mapped_column(String(128), nullable=True)
     status: Mapped[str] = mapped_column(
         String(32), nullable=False, default="open", server_default="open"
     )

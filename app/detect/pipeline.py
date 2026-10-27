@@ -137,6 +137,7 @@ class DetectionSummary:
     windows_scored: int = 0
     anomaly_ids: list[int] = field(default_factory=list)
     new_anomaly_ids: list[int] = field(default_factory=list)
+    new_ids_by_detector: dict[str, list[int]] = field(default_factory=dict)
 
 
 async def load_events(
@@ -201,13 +202,15 @@ async def run_detection(
             },
         ).returning(
             Anomaly.id,
+            Anomaly.detector,
             # Postgres sets xmax = 0 on freshly inserted rows, non-zero on updated ones
             literal_column("xmax = 0", Boolean).label("inserted"),
         )
-        for anomaly_id, inserted in (await session.execute(upsert)).all():
+        for anomaly_id, detector, inserted in (await session.execute(upsert)).all():
             summary.anomaly_ids.append(anomaly_id)
             if inserted:
                 summary.new_anomaly_ids.append(anomaly_id)
+                summary.new_ids_by_detector.setdefault(detector, []).append(anomaly_id)
 
     await session.commit()
 

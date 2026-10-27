@@ -26,8 +26,15 @@ class Settings(BaseSettings):
     celery_result_backend: str = "redis://localhost:6379/2"
 
     # ── LLM / Embeddings ─────────────────────────────
+    # Any OpenAI-compatible chat endpoint. With neither a key nor a base URL,
+    # triage still runs and writes a rule-based report instead.
     openai_api_key: str = ""
+    llm_base_url: str | None = None  # e.g. http://localhost:11434/v1 for Ollama
+    llm_model: str = "gpt-4o-mini"
+    llm_timeout_seconds: float = 30.0
+    # A 384-d sentence-transformers model, or "hashing" for the offline embedder
     embedding_model: str = "all-MiniLM-L6-v2"
+    runbooks_dir: str = "data/runbooks"
 
     # ── App ───────────────────────────────────────────
     log_level: str = "INFO"
@@ -42,6 +49,9 @@ class Settings(BaseSettings):
     detection_interval_seconds: int = 300
     # Each run refits on this much history, so it must cover many normal windows
     detection_lookback_minutes: int = 360
+    # Only these detectors' anomalies become incidents. Isolation Forest raises
+    # ~34 false alarms a day (README results), so it isn't triaged by default.
+    triage_detectors: list[str] = ["error_burst"]
 
 
 @lru_cache

@@ -40,8 +40,10 @@ flowchart LR
    anomalous), fitted per service: a statistical **error-burst** baseline, **Isolation Forest**, and
    (next) an **LSTM autoencoder**. Consecutive flagged minutes merge into one anomaly, and re-runs
    update rows instead of duplicating them. Runs on demand (`POST /detect`) or every 5 minutes (Celery beat).
-5. **Triage.** For each anomaly, retrieve the matching runbook sections (pgvector) and the relevant
-   log lines, and ask an LLM for a structured summary, root cause and next steps.
+5. **Triage.** Rank the anomaly's log patterns by how much more often they appear than in the hour
+   before, use the top ones to retrieve the right runbook (pgvector), then have an LLM write a
+   structured report. Every claim is checked against what it was shown, and with no LLM a rule-based
+   report is written instead.
 6. **Serve.** Incidents are stored, exposed through a REST API and pushed live to a dashboard.
 7. **Evaluate.** The log generator injects four labelled fault types (CPU spike, DB connection
    failure, bad deploy, memory leak), so each detector gets precision, recall and mean time to detect.
@@ -56,7 +58,7 @@ flowchart LR
 | 1. Ingest | Parser, templating, Postgres storage, labelled synthetic log generator | ✅ |
 | 2. Detect | Per-service features, error-burst baseline + Isolation Forest, `POST /detect`, scheduled Celery task, idempotent `anomalies` upserts | ✅ |
 | 3. Eval | Reproducible `run_eval.py`: precision, recall, F1, MTTD, false alarms/day, per-fault-type recall | ✅ |
-| 4. Triage | Runbook RAG + LLM summaries via Celery | 🔲 |
+| 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis-backed WebSocket alerts | 🔲 |
 | 6. Second model | LSTM autoencoder vs. Isolation Forest comparison | 🔲 |
 | 7. Deploy | Hosted demo, screenshots | 🔲 |
@@ -90,10 +92,25 @@ These seeds were never used to tune any detector setting.
 - **MTTD is detector latency**: when the first alert could fire, measured from the fault start. The
   5-minute Celery schedule adds up to 5 minutes on top in production.
 
+**Triage picks the right runbook** for the faults the error-burst detector catches (the only
+detector whose anomalies are triaged by default):
+
+| Fault type | Right runbook ranked first |
+|---|---|
+| Bad deploy | 45/46 |
+| CPU spike | 37/37 |
+| DB connection failure | 50/50 |
+| Memory leak | 38/38 |
+| **All** | **99%** (170/171; 137/138 on seeds never looked at during development) |
+
+This checks the deterministic part of triage (which log lines, which runbook) with the offline
+embedder, so it reproduces without downloading a model. The LLM's prose has no labelled ground truth,
+which is why its output is structured and checked instead ([DESIGN.md §4.8](docs/DESIGN.md)).
+
 **How it's measured.** A fault counts as detected if an anomaly on the *same service* overlaps its
 window. An anomaly that overlaps no fault is a false alarm, including one on the wrong service.
-Counts are pooled across runs before computing the ratios. The detection code is exactly what the API
-runs (`detect_events`).
+Counts are pooled across runs before computing the ratios. The detection and triage code is exactly
+what the API runs (`detect_events`, `build_evidence`, the same retrieval ranking).
 
 Reproduce it (about 1 minute; the output matches
 [`eval/results/heldout.json`](eval/results/heldout.json) byte for byte):
@@ -133,8 +150,37 @@ curl "http://localhost:8000/api/v1/events?service=api-gateway&level=ERROR"
 curl -X POST http://localhost:8000/api/v1/detect -H "Content-Type: application/json" -d '{}'
 curl "http://localhost:8000/api/v1/anomalies?detector=error_burst"
 
-# 9. Score every detector on 50 held-out runs (no database needed)
+# 9. Index the runbooks, then turn an anomaly into an incident
+#    (no LLM configured → rule-based report; set OPENAI_API_KEY or LLM_BASE_URL in .env for one)
+curl -X POST http://localhost:8000/api/v1/runbooks/index
+curl -X POST http://localhost:8000/api/v1/anomalies/1/triage
+
+# 10. Score every detector, and triage's runbook choice, on 50 held-out runs (no database needed)
 python scripts/run_eval.py
+```
+
+In Docker Compose this is automatic: the worker indexes runbooks when it starts, and the scheduled
+detection queues triage for every new error-burst anomaly.
+
+An incident (no LLM configured; trimmed):
+
+```json
+{
+  "summary": "error_burst flagged payment-service between 02:28 and 02:30 UTC: 6 errors in 30 events. Most unusual pattern: \"Worker thread pool exhausted, <NUM> requests queued\" (2x, vs 0x in the previous hour). 7 log pattern(s) did not appear at all in the previous hour.",
+  "root_cause": "The log patterns best match the CPU Spike Runbook (cpu_spike.md). Not confirmed by an LLM.",
+  "confidence": "low",
+  "runbook": "cpu_spike.md",
+  "next_steps": [
+    "Immediate: Scale horizontally with HPA or add spot instances",
+    "Short-term: Identify hot code path and add caching or circuit breaking",
+    "Long-term: Fix algorithmic complexity, add load shedding"
+  ],
+  "evidence": [
+    {"template": "Worker thread pool exhausted, <NUM> requests queued", "count": 2, "baseline_count": 0, "lift": 42.9},
+    {"template": "CPU usage at <NUM>% – throttling new requests", "count": 2, "baseline_count": 0, "lift": 42.9}
+  ],
+  "triage_method": "fallback"
+}
 ```
 
 Everything in containers (API runs migrations on start):
@@ -152,6 +198,8 @@ docker compose up --build
 | `GET` | `/api/v1/events` | Query logs (filter by service, level, time range) |
 | `POST` | `/api/v1/detect` | Run detection now (optional `service`, `since`, `until`, `detectors`) |
 | `GET` | `/api/v1/anomalies` | List detected anomalies (filter by detector, service) |
+| `POST` | `/api/v1/anomalies/{id}/triage` | Create (201) or return (200) the anomaly's incident |
+| `POST` | `/api/v1/runbooks/index` | Re-embed the runbooks into pgvector |
 | `GET` | `/api/v1/incidents` | List triaged incidents |
 | `GET` | `/api/v1/incidents/{id}` | Incident detail with linked anomaly and log lines |
 | `WS` | `/api/v1/ws/alerts` | Live incident stream |
@@ -170,7 +218,8 @@ app/
   ingest/     parser, templating, file reader
   detect/     features, detectors (error-burst, Isolation Forest, LSTM-AE), pipeline
   eval/       match anomalies to labelled faults, precision / recall / MTTD
-  rag/        runbook chunking, retrieval, LLM summarizer
+  triage/     evidence ranking (lift vs. the previous hour), anomaly → incident
+  rag/        runbook sections, embeddings, pgvector retrieval, LLM report + fallback
   workers/    Celery app and tasks
   models/     SQLAlchemy ORM models
 scripts/      synthetic log generator, run_eval.py

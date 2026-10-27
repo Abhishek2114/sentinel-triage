@@ -29,7 +29,7 @@ answers all four, and measures how well it does it.**
 |---|---|---|
 | Functional | Ingest logs in ISO, syslog and JSON formats | `app/ingest/parser.py` |
 | Functional | Detect anomalous time windows per service | Template features + error-burst baseline / Isolation Forest (`app/detect/`) |
-| Functional | Explain each anomaly with evidence and a runbook | RAG over runbooks + LLM (`app/rag/`, Phase 4) |
+| Functional | Explain each anomaly with evidence and a runbook | Lift-ranked evidence + pgvector runbook retrieval + optional LLM (`app/triage/`, `app/rag/`) |
 | Functional | Push incidents to a live dashboard | WebSocket (`app/api/ws.py`) |
 | Quality | **Measurable** detection quality | Labelled synthetic faults → precision, recall, MTTD (`scripts/run_eval.py`) |
 | Latency | Mean time to detect < 2 min | 1-minute windows, async workers |
@@ -90,7 +90,7 @@ or scaled independently.
 | **Store** | events → `log_events` (batched inserts, committed before 200) | `api/routes_ingest.py` |
 | **Featurize** | events → per-service 1-min `WindowFeatures` | `detect/features.py` |
 | **Detect** | windows → merged `AnomalyResult`s, upserted to `anomalies` | `detect/pipeline.py` |
-| **Triage** | anomaly + nearby logs + runbook chunks → `Incident` | `rag/`, `workers/tasks.py` |
+| **Triage** | anomaly → lift-ranked log patterns → best runbooks (pgvector) → report (LLM or rule-based) → `Incident` | `triage/`, `rag/`, `workers/tasks.py` |
 | **Serve** | incident → REST + WebSocket push | `api/` |
 | **Evaluate** | seeded runs → same `detect_events` → matched to labels → metrics | `eval/`, `scripts/run_eval.py` |
 
@@ -193,14 +193,52 @@ own clients.
 
 *(Current code has the in-process broadcast; the Redis bridge is part of Phase 5.)*
 
-### 4.8 The LLM is grounded, structured and optional
-- **Grounded:** the prompt contains the anomaly's actual log lines (by template,
-  with counts) and the top-k runbook chunks, never "guess what went wrong."
-- **Structured:** the model returns JSON (`summary`, `root_cause`,
-  `evidence_event_ids`, `runbook`, `confidence`), validated with Pydantic.
-- **Optional:** if the LLM is down or no key is set, the incident is still
-  created with a template-based summary. Detection never depends on the LLM.
-- **Bounded cost:** one call per anomaly (unique `anomaly_id`), capped input size.
+### 4.8 Triage: evidence first, the LLM last (and optional)
+Triage is four steps, and only the last one needs an LLM:
+
+1. **Evidence = what changed.** The anomaly window's lines are grouped by
+   template and ranked by *lift*: their rate now divided by their rate in the
+   hour before (counted in SQL with `GROUP BY template_id`). Steady traffic
+   scores ~1× and drops out; an injected fault's patterns score 30–60×. The
+   report gets the top 8 patterns with counts, an example line and event ids,
+   not thousands of raw lines.
+2. **Retrieval picks the runbook.** The top patterns become the query.
+   Runbooks are split by `##` section, embedded (sentence-transformers,
+   384-d) and searched with pgvector cosine distance. The best *runbooks* are
+   then sent whole, so Remediation is included even when only Symptoms matched.
+3. **The LLM writes the report** (any OpenAI-compatible endpoint) as JSON
+   validated by Pydantic: `summary`, `root_cause`, `confidence`, `runbook`,
+   `next_steps`, `evidence_event_ids`.
+4. **Grounding checks before saving:** cited event ids must be ones we sent,
+   and the cited runbook must be one of the excerpts; anything else is dropped.
+
+**Why this split:** steps 1–2 are deterministic and measurable, so the
+important choices (which lines, which runbook) don't depend on the model.
+`run_eval.py` checks step 2 directly: for every fault the error-burst detector
+catches, is the right runbook ranked first? **137 of 138** on held-out seeds
+1010–1049 (170/171 including 1000–1009, which I looked at while adding
+stemming to the offline embedder, so those don't count as unseen).
+
+**Optional by design:** with no LLM configured, or when the call times out,
+errors or returns invalid JSON, the incident is still written with a rule-based
+report (top pattern, matched runbook, its Remediation steps, `confidence:
+low`) and `triage_method = "fallback"`. Detection and incident creation never
+depend on the LLM.
+
+**Only trusted alarms are triaged.** By default only `error_burst` anomalies
+become incidents. Isolation Forest's ~34 false alarms a day (§4.9) would mean
+34 LLM calls and 34 bogus incidents a day: the evaluation decides what pages
+people.
+
+**Bounded cost:** at most one LLM call per anomaly. The incident check runs
+before the call, so a retried task doesn't pay twice, and the prompt is capped
+(8 patterns, 300-character examples, 2 short runbooks).
+
+**Trade-offs:** the evaluation measures the runbook choice, not the prose. The
+LLM's summary has no labelled ground truth here, which is why the structured
+fields and grounding checks matter. Hit rate is measured with the offline
+hashing embedder so it reproduces without downloading a model; the real
+embedder is the default at runtime.
 
 ### 4.9 A simple baseline beat the ML model, so it stays in
 **What happened:** the plan was "Isolation Forest on the five window features."
@@ -250,6 +288,15 @@ Phase 6 is meant to close.
 - **Complete windows only:** the scheduled run stops at the last full minute;
   a half-filled current minute would look like a traffic drop.
 
+### 4.11 Known limitation: one fault can become two incidents
+If the detector flags a fault, goes quiet for a few minutes, then flags it
+again, that is two anomalies and therefore two incidents (seen once in the
+smoke test: a bad deploy flagged at 03:39 and 03:44). The merge step only
+bridges a one-minute gap. The fix is incident *grouping*: attach a new anomaly
+to an open incident on the same service within N minutes instead of creating
+another. That needs an `anomalies.incident_id` link and is planned with the
+dashboard work, where it matters most.
+
 ## 5. Data model
 
 ```mermaid
@@ -276,14 +323,23 @@ erDiagram
         int anomaly_id FK "unique: one incident per anomaly"
         text summary
         text root_cause
+        string confidence
+        string runbook
+        text_array next_steps
+        jsonb evidence "ranked log patterns"
         int_array related_event_ids
+        string triage_method "llm | fallback"
+        string llm_model
         string status
     }
     runbook_chunks {
         int id PK
         string source_doc
+        int chunk_index
+        string section
         text text
-        vector embedding
+        string embedding_model "only compared within one model"
+        vector embedding "384-d"
     }
     anomalies ||--o| incidents : "triaged into"
     incidents }o--o{ log_events : "evidence"
@@ -303,7 +359,12 @@ once before starting the API workers, so they can't race to create tables.
 | Duplicate anomalies when detection re-runs | Unique `(detector, service, window_start)` + upsert |
 | Duplicate incidents if a triage task retries | `incidents.anomaly_id` is unique; task is idempotent |
 | Celery task can't reach the database | Retries 3× with a 30 s delay; each run uses its own unpooled engine, since asyncpg connections can't cross event loops |
-| LLM outage or rate limit | Celery retries with backoff, then falls back to a non-LLM summary |
+| LLM outage, rate limit or bad output | SDK retries twice (30 s timeout), then the rule-based report is saved; the task never fails because of the LLM |
+| Prompt injection through log lines ("ignore previous instructions…") | Logs go inside a `<logs>` block marked as untrusted data, lines can't close it, the reply must match a strict schema, and cited ids/runbooks are checked against what was sent |
+| LLM cites evidence it wasn't shown | Event ids and runbook names not in the prompt are dropped before saving |
+| A DB connection held open during a slow LLM call | The read transaction is committed before the call |
+| Vectors from two embedding models compared | Each chunk stores its `embedding_model`; retrieval filters on it |
+| Embedding model can't be downloaded (offline) | Falls back to the hashing embedder, logged as a warning |
 | Dead WebSocket clients pile up | Removed in a `finally` block and on failed send |
 | Secrets in the repo | `.env` is git-ignored; only `.env.example` is committed |
 | No authentication yet | Next step: API key or OAuth on all routes before any public deploy |
@@ -328,7 +389,7 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 | 0–1 ✅ | Skeleton, parser, storage, generator | Foundation |
 | 2 ✅ | Detection writes `anomalies` per service (API + scheduled task) | First real output |
 | 3 ✅ | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
-| 4 | RAG + LLM triage | The "wow" feature, now measurable |
+| 4 ✅ | Evidence + runbook RAG + optional LLM triage, runbook choice measured | The "wow" feature, now measurable |
 | 5 | Dashboard + Redis-backed WebSocket | Makes it demoable |
 | 6 | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
 | 7 | Hosted demo + screenshots | What a reviewer sees first |

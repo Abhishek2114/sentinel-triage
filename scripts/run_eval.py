@@ -3,7 +3,9 @@
 
 Generates seeded runs of synthetic logs (deterministic, so anyone gets the same
 numbers), runs every detector through the production detection code, and
-reports precision, recall, F1 and time to detect.
+reports precision, recall, F1 and time to detect. It also checks triage: for
+each fault the error-burst detector catches, does evidence + retrieval put the
+right runbook first?
 
 The default writes eval/results/heldout.json, which is committed: rerunning
 unchanged code reproduces it byte for byte, so `git diff` shows exactly how a
@@ -14,6 +16,8 @@ Usage:
     python scripts/run_eval.py --seeds 1000-1004     # quick check
     python scripts/run_eval.py --logs data/synthetic/events.log \\
         --labels data/synthetic/labels.jsonl         # score one existing run
+    python scripts/run_eval.py --embedder all-MiniLM-L6-v2 \\
+        --output eval/results/minilm.json            # triage with the real model
 
 Seeds 1000+ were never used while tuning detector settings; keep tuning on
 other seeds so these numbers stay honest.
@@ -31,8 +35,10 @@ from typing import Any
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
 from app.detect.pipeline import DEFAULT_DETECTORS, DETECTORS  # noqa: E402
-from app.eval.harness import evaluate_run  # noqa: E402
-from app.eval.metrics import DetectorReport  # noqa: E402
+from app.eval.harness import RunbookIndex, evaluate_run  # noqa: E402
+from app.eval.metrics import DetectorReport, RetrievalReport  # noqa: E402
+from app.rag.embeddings import HASHING, get_embedder  # noqa: E402
+from app.rag.ingest_docs import load_runbooks  # noqa: E402
 from scripts.generate_logs import generate_logs  # noqa: E402
 
 HELD_OUT_SEEDS = "1000-1049"  # 50 runs, 200 faults
@@ -87,6 +93,18 @@ def markdown_table(reports: dict[str, DetectorReport]) -> str:
     return "\n".join(rows)
 
 
+def retrieval_table(report: RetrievalReport) -> str:
+    """Triage: right runbook ranked first, per fault type."""
+    rows = [
+        f"| Right runbook first (`{report.detector}` catches, `{report.embedder}` embedder) | |",
+        "|---|---|",
+    ]
+    for ft, (hit, total) in sorted(report.by_fault_type.items()):
+        rows.append(f"| {ft} | {hit}/{total} |")
+    rows.append(f"| **All** | **{report.hit_rate:.0%}** ({report.evaluated} faults) |")
+    return "\n".join(rows)
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Evaluate anomaly detectors on labelled faults")
     parser.add_argument(
@@ -107,6 +125,14 @@ def main() -> None:
         default=list(DEFAULT_DETECTORS),
     )
     parser.add_argument("--window-minutes", type=int, default=1)
+    parser.add_argument(
+        "--embedder",
+        default=HASHING,
+        help="Embedder for the triage check (default: the offline hashing embedder, so "
+        "results reproduce without downloading a model)",
+    )
+    parser.add_argument("--runbooks-dir", type=Path, default=Path("data/runbooks"))
+    parser.add_argument("--no-triage", action="store_true", help="Skip the runbook check")
     parser.add_argument(
         "--output",
         type=Path,
@@ -147,30 +173,55 @@ def main() -> None:
             }
         }
 
+    index = None
+    if not args.no_triage:
+        index = RunbookIndex(get_embedder(args.embedder), load_runbooks(args.runbooks_dir))
+        if index.embedder.name != args.embedder:
+            parser.error(f"Could not load embedder {args.embedder!r}")
+
     totals = {name: DetectorReport(detector=name) for name in args.detectors}
+    triage_total: RetrievalReport | None = None
     per_run: list[dict[str, Any]] = []
     for run_name, lines, labels in runs:
-        reports = evaluate_run(lines, labels, args.detectors, args.window_minutes)
-        for name, report in reports.items():
+        result_run = evaluate_run(
+            lines, labels, args.detectors, args.window_minutes, runbooks=index
+        )
+        for name, report in result_run.detectors.items():
             totals[name].add(report)
-        per_run.append({"run": run_name, "detectors": [r.to_dict() for r in reports.values()]})
+        run_entry: dict[str, Any] = {
+            "run": run_name,
+            "detectors": [r.to_dict() for r in result_run.detectors.values()],
+        }
+        if result_run.retrieval is not None:
+            if triage_total is None:
+                triage_total = RetrievalReport(
+                    result_run.retrieval.detector, result_run.retrieval.embedder
+                )
+            triage_total.add(result_run.retrieval)
+            run_entry["triage"] = result_run.retrieval.to_dict()
+        per_run.append(run_entry)
         print(
             f"  {run_name:>10}: "
             + "  ".join(
-                f"{r.detector} P={r.precision:.2f} R={r.recall:.2f}" for r in reports.values()
+                f"{r.detector} P={r.precision:.2f} R={r.recall:.2f}"
+                for r in result_run.detectors.values()
             )
         )
 
     faults = next(iter(totals.values())).faults
     print(f"\n{len(runs)} run(s), {faults} labelled faults\n")
     print(markdown_table(totals))
+    if triage_total is not None:
+        print("\n" + retrieval_table(triage_total))
 
-    result = {
+    result: dict[str, Any] = {
         "source": source,
         "window_minutes": args.window_minutes,
         "detectors": [r.to_dict() for r in totals.values()],
-        "runs": per_run,
     }
+    if triage_total is not None:
+        result["triage"] = triage_total.to_dict()
+    result["runs"] = per_run
     args.output.parent.mkdir(parents=True, exist_ok=True)
     args.output.write_text(json.dumps(result, indent=2) + "\n", encoding="utf-8")
     print(f"\nSaved {args.output}")

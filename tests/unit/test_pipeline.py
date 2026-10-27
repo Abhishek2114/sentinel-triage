@@ -87,6 +87,6 @@ def test_error_burst_finds_injected_faults(seed):
     a broken detector.
     """
     lines, labels = generate_logs(seed=seed)
-    report = evaluate_run(lines, labels, ["error_burst"])["error_burst"]
+    report = evaluate_run(lines, labels, ["error_burst"]).detectors["error_burst"]
     assert report.precision >= 0.75
     assert report.recall >= 0.5

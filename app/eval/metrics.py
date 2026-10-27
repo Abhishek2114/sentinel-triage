@@ -159,3 +159,55 @@ def score_detector(
         report.delays_seconds.append(max(0.0, (min(alert_times) - fault.start).total_seconds()))
 
     return report
+
+
+@dataclass
+class RetrievalReport:
+    """How often triage picked the right runbook for a caught fault."""
+
+    detector: str
+    embedder: str
+    # fault_type -> [right runbook on top, faults evaluated]
+    by_fault_type: dict[str, list[int]] = field(default_factory=dict)
+    # (fault_type, runbook picked instead) for each miss
+    misses: list[tuple[str, str | None]] = field(default_factory=list)
+
+    def record(self, fault_type: str, top_runbook: str | None) -> None:
+        counts = self.by_fault_type.setdefault(fault_type, [0, 0])
+        counts[1] += 1
+        if top_runbook == f"{fault_type}.md":
+            counts[0] += 1
+        else:
+            self.misses.append((fault_type, top_runbook))
+
+    @property
+    def evaluated(self) -> int:
+        return sum(total for _, total in self.by_fault_type.values())
+
+    @property
+    def hit_rate(self) -> float:
+        hits = sum(hit for hit, _ in self.by_fault_type.values())
+        return hits / self.evaluated if self.evaluated else 0.0
+
+    def add(self, other: RetrievalReport) -> None:
+        for fault_type, (hit, total) in other.by_fault_type.items():
+            counts = self.by_fault_type.setdefault(fault_type, [0, 0])
+            counts[0] += hit
+            counts[1] += total
+        self.misses.extend(other.misses)
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "detector": self.detector,
+            "embedder": self.embedder,
+            "runbook_hit_rate": round(self.hit_rate, 4),
+            "evaluated": self.evaluated,
+            "by_fault_type": {
+                ft: {"hit": hit, "total": total}
+                for ft, (hit, total) in sorted(self.by_fault_type.items())
+            },
+            "misses": [
+                {"fault_type": ft, "picked": doc}
+                for ft, doc in sorted(self.misses, key=lambda m: (m[0], m[1] or ""))
+            ],
+        }

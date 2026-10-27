@@ -118,13 +118,15 @@ class TestHarness:
     def test_stray_unstructured_line_does_not_stretch_the_run(self):
         # The parser stamps lines without a timestamp with "now", years after the data
         lines, labels = generate_logs(duration_hours=2, events_per_minute=20, fault_count=1, seed=5)
-        report = evaluate_run([*lines, "free text with no timestamp"], labels)["error_burst"]
+        report = evaluate_run([*lines, "free text with no timestamp"], labels).detectors[
+            "error_burst"
+        ]
         assert 1.9 < report.hours < 2.1
 
     def test_evaluation_is_reproducible(self):
         lines, labels = generate_logs(duration_hours=2, events_per_minute=20, fault_count=2, seed=9)
-        first = {k: v.to_dict() for k, v in evaluate_run(lines, labels).items()}
-        second = {k: v.to_dict() for k, v in evaluate_run(lines, labels).items()}
+        first = {k: v.to_dict() for k, v in evaluate_run(lines, labels).detectors.items()}
+        second = {k: v.to_dict() for k, v in evaluate_run(lines, labels).detectors.items()}
         assert first == second
         assert set(first) == {"error_burst", "iforest"}
         assert first["error_burst"]["faults"] == 2
