@@ -1,5 +1,7 @@
 """Ingest endpoint – upload log lines or point to a file."""
 
+import asyncio
+from datetime import timedelta
 from pathlib import Path
 
 from fastapi import APIRouter, Depends, HTTPException
@@ -9,9 +11,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.config import get_settings
 from app.core.db import get_session
 from app.core.logging import get_logger
-from app.ingest.parser import parse_line
+from app.core.metrics import record_ingest
+from app.core.security import require_key
+from app.ingest.pipeline import prepare_lines
 from app.ingest.reader import read_file_lines
-from app.ingest.templates import extract_template, template_id
 from app.models.event import LogEvent
 from app.schemas import IngestRequest, IngestResponse
 
@@ -39,7 +42,9 @@ def _resolve_ingest_path(file_path: str) -> Path:
     return resolved
 
 
-@router.post("/ingest", response_model=IngestResponse)
+@router.post(
+    "/ingest", response_model=IngestResponse, dependencies=[Depends(require_key)]
+)
 async def ingest_logs(
     body: IngestRequest,
     session: AsyncSession = Depends(get_session),
@@ -53,31 +58,23 @@ async def ingest_logs(
     else:
         raise HTTPException(status_code=422, detail="Provide either 'lines' or 'file_path'")
 
-    ingested = 0
-    errors = 0
-    batch: list[dict[str, object]] = []
-
-    for raw_line in lines:
-        if not raw_line.strip():
-            continue
-        parsed = parse_line(raw_line)
-        if parsed is None:
-            errors += 1
-            continue
-
-        parsed.template_id = template_id(extract_template(parsed.message))
-        batch.append(parsed.model_dump())
-        ingested += 1
-
-        if len(batch) >= _BATCH_SIZE:
-            await session.execute(insert(LogEvent), batch)
-            batch.clear()
-
-    if batch:
-        await session.execute(insert(LogEvent), batch)
+    settings = get_settings()
+    # Parsing, redaction and templating are CPU work: run them in a thread so
+    # one large request doesn't stall every other request on this process
+    prepared = await asyncio.to_thread(
+        prepare_lines,
+        lines,
+        max_line_chars=settings.max_line_chars,
+        max_clock_skew=timedelta(seconds=settings.max_clock_skew_seconds),
+        max_multiline_lines=settings.max_multiline_lines,
+    )
+    for start in range(0, len(prepared.rows), _BATCH_SIZE):
+        await session.execute(insert(LogEvent), prepared.rows[start : start + _BATCH_SIZE])
+    ingested, errors = len(prepared.rows), prepared.errors
+    record_ingest(ingested, errors, prepared.stats)
 
     # Commit before responding, so "ingested" is only reported once it is durable
     await session.commit()
 
-    log.info("ingest_complete", ingested=ingested, errors=errors)
+    log.info("ingest_complete", ingested=ingested, errors=errors, **dict(prepared.stats))
     return IngestResponse(ingested=ingested, errors=errors)

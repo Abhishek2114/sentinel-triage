@@ -1,0 +1,13 @@
+anonymous POST /ingest: 401
+anonymous POST /runbooks/index: 401
+anonymous PATCH /incidents/1: 401 (404 = reached the handler)
+key in query string: 400 (accepted, so keys would end up in access logs)
+~41 MB body: HTTP 413, peak Python allocation 83 MB
+2026-10-27 20:06:13 [info     ] ingest_complete                errors=0 ingested=1 truncated=1
+single 5 MB log line: 200 {'ingested': 1, 'errors': 0}
+longest stored message: 16,366 chars
+missing security headers: []
+
+problems: []
+
+NOT REPRODUCED: hardening in place

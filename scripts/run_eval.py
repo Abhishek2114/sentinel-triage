@@ -39,6 +39,7 @@ from app.eval.harness import RunbookIndex, evaluate_run  # noqa: E402
 from app.eval.metrics import DetectorReport, IncidentReport, RetrievalReport  # noqa: E402
 from app.rag.embeddings import HASHING, get_embedder  # noqa: E402
 from app.rag.ingest_docs import load_runbooks  # noqa: E402
+from app.rag.retriever import RETRIEVAL_MODES, resolve_mode  # noqa: E402
 from scripts.generate_logs import generate_logs  # noqa: E402
 
 HELD_OUT_SEEDS = "1000-1049"  # 50 runs, 200 faults
@@ -146,6 +147,12 @@ def main() -> None:
         "results reproduce without downloading a model)",
     )
     parser.add_argument("--runbooks-dir", type=Path, default=Path("data/runbooks"))
+    parser.add_argument(
+        "--retrieval-mode",
+        choices=["auto", *RETRIEVAL_MODES],
+        default="auto",
+        help="Runbook ranking for the triage check (auto = what production uses)",
+    )
     parser.add_argument("--no-triage", action="store_true", help="Skip the runbook check")
     parser.add_argument(
         "--output",
@@ -189,7 +196,12 @@ def main() -> None:
 
     index = None
     if not args.no_triage:
-        index = RunbookIndex(get_embedder(args.embedder), load_runbooks(args.runbooks_dir))
+        embedder = get_embedder(args.embedder)
+        index = RunbookIndex(
+            embedder,
+            load_runbooks(args.runbooks_dir),
+            mode=resolve_mode(args.retrieval_mode, embedder),
+        )
         if index.embedder.name != args.embedder:
             parser.error(f"Could not load embedder {args.embedder!r}")
 
@@ -239,6 +251,8 @@ def main() -> None:
 
     result: dict[str, Any] = {
         "source": source,
+        "retrieval_mode": index.mode if index is not None else None,
+        "runbooks": len({c.source_doc for c in index.chunks}) if index is not None else None,
         "window_minutes": args.window_minutes,
         "detectors": [r.to_dict() for r in totals.values()],
     }

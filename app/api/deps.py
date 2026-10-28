@@ -3,6 +3,7 @@
 import asyncio
 
 from app.core.config import get_settings
+from app.core.db import async_session_factory
 from app.rag.embeddings import Embedder, get_embedder
 from app.rag.summarizer import LLMClient, llm_from_settings
 from app.realtime import RedisFactory, redis_factory
@@ -14,7 +15,7 @@ async def get_embedder_dep() -> Embedder:
 
 
 def get_llm_dep() -> LLMClient | None:
-    return llm_from_settings(get_settings())
+    return llm_from_settings(get_settings(), async_session_factory)
 
 
 def get_redis_factory() -> RedisFactory:

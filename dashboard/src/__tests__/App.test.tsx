@@ -1,13 +1,14 @@
 import { act, fireEvent, render, screen, waitFor, within } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import type { Incident } from "../api";
-import { App } from "../App";
+import type { Incident, Overview, PublicConfig } from "../api";
+import { App, parseRoute, routeHash } from "../App";
 import { detail, incident } from "./fixtures";
 
 /** Stands in for the browser WebSocket so tests can push events. */
 class FakeSocket {
   static instances: FakeSocket[] = [];
+  sent: string[] = [];
   onopen: (() => void) | null = null;
   onmessage: ((m: { data: string }) => void) | null = null;
   onclose: (() => void) | null = null;
@@ -17,140 +18,183 @@ class FakeSocket {
   close() {
     this.onclose?.();
   }
+  send(data: string) {
+    this.sent.push(data);
+  }
   open() {
     act(() => this.onopen?.());
   }
-  send(event: { type: string; incident: Incident }) {
+  push(event: { type: string; incident: Incident }) {
     act(() => this.onmessage?.({ data: JSON.stringify(event) }));
-  }
-  drop() {
-    act(() => this.onclose?.());
   }
 }
 
 let server: Incident[];
+let config: PublicConfig;
+let calls: { url: string; init?: RequestInit }[];
+
+function overview(): Overview {
+  const open = server.filter((i) => i.status === "open");
+  return {
+    verdict: open.length
+      ? { level: "incident", headline: `${open.length} open incident`, detail: "payment-service (likely CPU spike)." }
+      : { level: "ok", headline: "All clear", detail: "5 services reporting." },
+    as_of: "2026-10-27T12:00:00Z",
+    anchored: false,
+    window_minutes: 30,
+    services: [
+      {
+        service: "payment-service",
+        status: open.length ? "incident" : "healthy",
+        events: 600,
+        errors: 42,
+        error_rate: 0.07,
+        last_seen: "2026-10-27T11:59:00Z",
+        open_incident_id: open[0]?.id ?? null,
+        errors_per_minute: Array(30).fill(1),
+        events_per_minute: Array(30).fill(20),
+      },
+    ],
+    services_truncated: false,
+    open_incidents: open,
+  };
+}
 
 function mockApi() {
   vi.stubGlobal(
     "fetch",
     vi.fn(async (url: string, init?: RequestInit) => {
-      const json = (body: unknown) => new Response(JSON.stringify(body), { status: 200 });
+      calls.push({ url, init });
+      const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
+      if (url === "/api/v1/config") return json(config);
+      if (url.startsWith("/api/v1/overview")) return json(overview());
       if (url.startsWith("/api/v1/incidents?")) return json(server);
-      if (url.startsWith("/api/v1/anomalies")) return json([]);
+      if (url.startsWith("/api/v1/events")) return json([]);
+      if (url === "/api/v1/demo/run")
+        return json({ status: "started", lines: 1200, services: [], fault: "cpu_spike", detail: "Synthetic cpu spike injected." }, 202);
       const match = url.match(/^\/api\/v1\/incidents\/(\d+)$/);
       if (match) {
         const found = server.find((i) => i.id === Number(match[1]))!;
         if (init?.method === "PATCH") {
-          const { status } = JSON.parse(String(init.body)) as Pick<Incident, "status">;
-          Object.assign(found, { status, updated_at: "2026-10-27T13:00:00Z" });
+          const body = JSON.parse(String(init.body)) as { status: Incident["status"]; resolution?: string };
+          Object.assign(found, { ...body, updated_at: "2026-10-27T13:00:00Z" });
           return json(found);
         }
-        return json(detail(found));
+        return json({ ...detail(found), similar_incidents: [] });
       }
       return new Response("not found", { status: 404 });
     }),
   );
 }
 
-const renderApp = () =>
-  render(<App openSocket={(url) => new FakeSocket(url) as unknown as WebSocket} />);
+function renderApp() {
+  return render(<App openSocket={(url) => new FakeSocket(url) as unknown as WebSocket} />);
+}
 
-const cards = () =>
-  within(screen.getByRole("region", { name: "Incidents" })).queryAllByRole("listitem");
+beforeEach(() => {
+  FakeSocket.instances = [];
+  calls = [];
+  server = [incident()];
+  config = {
+    version: "0.2.0",
+    demo_mode: false,
+    read_requires_key: false,
+    write_requires_key: false,
+    llm_provider: null,
+    llm_calls_today: 0,
+    llm_calls_limit: 200,
+  };
+  sessionStorage.clear();
+  window.location.hash = "";
+  mockApi();
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+});
+
+describe("routing", () => {
+  it("round-trips hashes", () => {
+    expect(parseRoute("#/incidents/12")).toMatchObject({ view: "incidents", incident: 12 });
+    expect(parseRoute("#/logs?service=api&event=9")).toMatchObject({ view: "logs", service: "api", event: 9 });
+    expect(parseRoute("#/nonsense").view).toBe("overview");
+    expect(routeHash({ view: "logs", service: "a b" })).toBe("#/logs?service=a+b");
+  });
+});
 
 describe("App", () => {
-  beforeEach(() => {
-    FakeSocket.instances = [];
-    server = [incident({ id: 1 })];
-    mockApi();
-  });
-  afterEach(() => {
-    vi.unstubAllGlobals();
-    vi.useRealTimers();
-  });
-
-  it("shows incidents and the selected incident's detail", async () => {
+  it("answers 'is anything wrong?' first, with the service board", async () => {
     renderApp();
-    expect(await screen.findByRole("heading", { name: /payment-service · CPU Spike/ })).toBeTruthy();
-    expect(screen.getByText("CPU usage at <NUM>%")).toBeTruthy();
-    expect(screen.getByText("42.9×")).toBeTruthy();
-    expect(screen.getByText("Immediate: Scale horizontally")).toBeTruthy();
+    expect(await screen.findByRole("heading", { level: 1, name: "1 open incident" })).toBeTruthy();
+    const board = screen.getByRole("list", { name: "Services" });
+    expect(within(board).getByText("payment-service")).toBeTruthy();
+    expect(within(board).getByText("Incident")).toBeTruthy();
+    expect(screen.getByRole("img", { name: /payment-service: 600 events and 30 errors/ })).toBeTruthy();
   });
 
-  it("goes live, adds incidents from events, and keeps the selection", async () => {
+  it("navigates with number keys and opens help with ?", async () => {
     renderApp();
-    await screen.findByRole("heading", { name: /payment-service/ });
-    const socket = FakeSocket.instances[0];
-    expect(socket.url).toMatch(/\/api\/v1\/ws\/alerts$/);
-    socket.open();
-    expect(screen.getByRole("status").textContent).toContain("Live");
+    await screen.findByRole("heading", { level: 1, name: "1 open incident" });
+    fireEvent.keyDown(window, { key: "2" });
+    await waitFor(() => expect(window.location.hash).toBe("#/incidents"));
+    fireEvent.keyDown(window, { key: "?" });
+    expect(await screen.findByRole("heading", { name: "Keyboard shortcuts" })).toBeTruthy();
+  });
 
-    socket.send({
+  it("adds live incidents and announces them to screen readers", async () => {
+    window.location.hash = "#/incidents";
+    renderApp();
+    await screen.findByText("#1");
+    FakeSocket.instances[0].open();
+    FakeSocket.instances[0].push({
       type: "incident.created",
-      incident: incident({
-        id: 2,
-        service: "api-gateway",
-        runbook: "db_connection_failure.md",
-        last_seen_at: "2024-06-15T05:00:00Z",
-      }),
+      incident: incident({ id: 2, service: "user-service", runbook: "db_connection_failure.md" }),
     });
-
-    await waitFor(() => expect(cards()).toHaveLength(2));
-    expect(screen.getByText("DB Connection Failure")).toBeTruthy();
-    expect(screen.getByText("New incident on api-gateway")).toBeTruthy();
-    // Still reading incident 1
-    expect(screen.getByRole("heading", { name: /payment-service/ })).toBeTruthy();
+    expect(await screen.findByText("user-service")).toBeTruthy();
+    expect(screen.getByText("New incident #2 on user-service: DB connection failure")).toBeTruthy();
   });
 
-  it("updates a grouped incident in place", async () => {
+  it("renders the triage and resolves with a note for incident memory", async () => {
+    window.location.hash = "#/incidents/1";
     renderApp();
-    await screen.findByRole("heading", { name: /payment-service/ });
+    expect(await screen.findByRole("heading", { name: /payment-service: CPU spike/ })).toBeTruthy();
+    expect(screen.getByRole("heading", { name: "What happened" })).toBeTruthy();
+    expect(screen.getByText("CPU usage at <NUM>%")).toBeTruthy();
+    fireEvent.change(screen.getByLabelText(/What fixed it/), { target: { value: "Scaled out to 6 pods" } });
+    fireEvent.click(screen.getByRole("button", { name: "Resolve incident" }));
+    await waitFor(() => expect(server[0].status).toBe("resolved"));
+    expect(server[0].resolution).toBe("Scaled out to 6 pods");
+  });
+
+  it("sends the API key only in headers, never in a URL", async () => {
+    config.write_requires_key = true;
+    config.read_requires_key = true;
+    sessionStorage.setItem("sentinel.apiKey", "secret-key-123");
+    renderApp();
+    await screen.findByRole("heading", { level: 1, name: "1 open incident" });
     FakeSocket.instances[0].open();
-
-    FakeSocket.instances[0].send({
-      type: "incident.updated",
-      incident: incident({ anomaly_count: 3, updated_at: "2026-10-27T11:00:00Z" }),
-    });
-
-    await waitFor(() => expect(screen.getAllByText(/3 anomalies/).length).toBeGreaterThan(0));
-    expect(cards()).toHaveLength(1);
+    expect(calls.every((c) => !c.url.includes("secret-key-123"))).toBe(true);
+    expect(FakeSocket.instances[0].url).not.toContain("secret-key-123");
+    const overviewCall = calls.find((c) => c.url.startsWith("/api/v1/overview"))!;
+    expect((overviewCall.init?.headers as Record<string, string>).Authorization).toBe("Bearer secret-key-123");
+    expect(JSON.parse(FakeSocket.instances[0].sent[0])).toEqual({ type: "auth", key: "secret-key-123" });
   });
 
-  it("resolves an incident and moves it between filters", async () => {
+  it("labels the public demo as synthetic and runs it", async () => {
+    config.demo_mode = true;
+    config.write_requires_key = true;
     renderApp();
-    await screen.findByRole("heading", { name: /payment-service/ });
-
-    fireEvent.click(screen.getByRole("button", { name: "Resolve" }));
-
-    await waitFor(() => expect(screen.getByRole("button", { name: "Reopen" })).toBeTruthy());
-    expect(screen.getByRole("tab", { name: /Open/ }).textContent).toContain("0");
-    expect(screen.getByRole("tab", { name: /Resolved/ }).textContent).toContain("1");
+    expect((await screen.findByText(/shows/)).textContent).toContain("synthetic");
+    fireEvent.click(await screen.findByRole("button", { name: "Run demo" }));
+    expect(await screen.findByText("Synthetic cpu spike injected.")).toBeTruthy();
   });
 
-  it("reconnects after the socket drops and refetches", async () => {
-    vi.useFakeTimers({ shouldAdvanceTime: true });
+  it("hides write actions without a key when writes need one", async () => {
+    config.write_requires_key = true;
+    window.location.hash = "#/incidents/1";
     renderApp();
-    await screen.findByRole("heading", { name: /payment-service/ });
-    FakeSocket.instances[0].open();
-
-    FakeSocket.instances[0].drop();
-    expect(screen.getByRole("status").textContent).toContain("Reconnecting");
-
-    server.push(incident({ id: 5, service: "user-service", last_seen_at: "2024-06-15T04:00:00Z" }));
-    await act(async () => {
-      vi.advanceTimersByTime(1_100);
-    });
-    expect(FakeSocket.instances).toHaveLength(2);
-    FakeSocket.instances[1].open();
-
-    // Missed while disconnected, picked up by the refetch on reconnect
-    await waitFor(() => expect(cards()).toHaveLength(2));
-    expect(screen.getByRole("status").textContent).toContain("Live");
-  });
-
-  it("shows an empty state with next steps when there are no incidents", async () => {
-    server = [];
-    renderApp();
-    expect(await screen.findByRole("heading", { name: "No incidents yet" })).toBeTruthy();
+    await screen.findByRole("heading", { name: /payment-service: CPU spike/ });
+    expect(screen.queryByRole("button", { name: "Resolve incident" })).toBeNull();
+    expect(screen.getByRole("button", { name: "Add an API key" })).toBeTruthy();
   });
 });

@@ -77,9 +77,11 @@ class TestParseEdgeCases:
         assert result is not None
         assert result.level == "CRITICAL"
 
-    def test_oversized_service_is_rejected_not_raised(self):
+    def test_oversized_service_is_cut_not_raised(self):
         # Used to raise ValidationError and fail the whole /ingest request with a 500
-        assert parse_line("2024-06-15T10:30:00Z " + "s" * 200 + " INFO hi") is None
+        result = parse_line("2024-06-15T10:30:00Z " + "s" * 200 + " INFO hi")
+        assert result is not None
+        assert result.service == "s" * 64
 
     def test_oversized_json_level_is_rejected_not_raised(self):
         line = '{"timestamp": "2024-06-15T10:30:00Z", "level": "' + "L" * 30 + '"}'

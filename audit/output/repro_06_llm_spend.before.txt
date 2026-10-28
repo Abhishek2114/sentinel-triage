@@ -1,0 +1,32 @@
+budget-like settings: none
+2026-10-27 20:01:53 [info     ] runbooks_indexed               chunks=0 embedder=hashing
+2026-10-27 20:01:53 [info     ] ingest_complete                errors=0 ingested=3000
+2026-10-27 20:01:53 [info     ] detection_complete             anomalies=25 new=25 services=25 windows=1000
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=1 incident_id=1 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=2 incident_id=2 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=3 incident_id=3 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=4 incident_id=4 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=5 incident_id=5 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=6 incident_id=6 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=7 incident_id=7 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=8 incident_id=8 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=9 incident_id=9 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=10 incident_id=10 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=11 incident_id=11 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=12 incident_id=12 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=13 incident_id=13 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=14 incident_id=14 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=15 incident_id=15 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=16 incident_id=16 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=17 incident_id=17 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=18 incident_id=18 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=19 incident_id=19 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=20 incident_id=20 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=21 incident_id=21 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=22 incident_id=22 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=23 incident_id=23 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=24 incident_id=24 method=llm runbook=None
+2026-10-27 20:01:53 [info     ] incident_opened                anomaly_id=25 incident_id=25 method=llm runbook=None
+25 anomalies on 25 services → 25 LLM calls
+
+REPRODUCED: LLM calls exceed the configured daily cap of 10

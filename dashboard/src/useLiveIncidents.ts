@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 
-import { alertsUrl, api, type Incident, type IncidentEvent } from "./api";
+import { alertsUrl, api, apiKey, type Incident, type IncidentEvent } from "./api";
 import { applyEvent, mergeIncidents, parseEvent, upsertIncident } from "./incidents";
 
 export type Connection = "connecting" | "live" | "reconnecting";
@@ -49,6 +49,9 @@ export function useLiveIncidents(
     const connect = () => {
       socket = openSocketRef.current(alertsUrl());
       socket.onopen = () => {
+        // Private deployments expect the key as the first message (never in the URL)
+        const key = apiKey.get();
+        if (key) socket?.send(JSON.stringify({ type: "auth", key }));
         backoff = MIN_BACKOFF_MS;
         setConnection("live");
         void refresh();

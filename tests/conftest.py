@@ -60,7 +60,7 @@ async def clean_db() -> AsyncIterator[None]:
         async with engine.begin() as conn:
             await conn.execute(
                 text(
-                    "TRUNCATE incidents, anomalies, log_events, runbook_chunks "
+                    "TRUNCATE incidents, anomalies, log_events, runbook_chunks, llm_usage "
                     "RESTART IDENTITY CASCADE"
                 )
             )

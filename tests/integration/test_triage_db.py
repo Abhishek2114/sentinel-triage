@@ -12,9 +12,12 @@ from app.main import app
 from app.models.runbook import RunbookChunkRow
 from app.rag.embeddings import HashingEmbedder
 from app.rag.index import count_chunks, index_runbooks
+from app.rag.ingest_docs import load_runbooks
 from scripts.generate_logs import generate_logs
 
 pytestmark = pytest.mark.usefixtures("clean_db")
+
+N_CHUNKS = len(load_runbooks("data/runbooks"))
 
 
 class FakeLLM:
@@ -62,16 +65,16 @@ async def test_indexing_replaces_only_this_embedders_chunks(client):
         )
         await session.commit()
 
-        assert await index_runbooks(session, HashingEmbedder(), "data/runbooks") == 16
-        assert await index_runbooks(session, HashingEmbedder(), "data/runbooks") == 16
-        assert await count_chunks(session, "hashing") == 16
+        assert await index_runbooks(session, HashingEmbedder(), "data/runbooks") == N_CHUNKS
+        assert await index_runbooks(session, HashingEmbedder(), "data/runbooks") == N_CHUNKS
+        assert await count_chunks(session, "hashing") == N_CHUNKS
         assert await count_chunks(session, "other-model") == 1
 
 
 @pytest.mark.usefixtures("no_llm")
 async def test_triage_creates_one_incident_per_anomaly(client):
     resp = await client.post("/api/v1/runbooks/index")
-    assert resp.json() == {"chunks": 16, "embedding_model": "hashing"}
+    assert resp.json() == {"chunks": N_CHUNKS, "embedding_model": "hashing"}
     anomaly = await _first_anomaly(client)
 
     resp = await client.post(f"/api/v1/anomalies/{anomaly['id']}/triage")

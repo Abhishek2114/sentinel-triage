@@ -1,0 +1,20 @@
+{"query": "pg pool drained, every request waits for a conn then gives up", "runbook": "db_connection_failure.md"}
+{"query": "postgres refused us: could not connect to server on port 5432", "runbook": "db_connection_failure.md"}
+{"query": "p99 latency through the roof, worker threads all busy, cores pegged", "runbook": "cpu_spike.md"}
+{"query": "timeouts everywhere, box at full processor utilisation", "runbook": "cpu_spike.md"}
+{"query": "errors started right after v2.14 rolled out, nil pointer in handler", "runbook": "bad_deploy.md"}
+{"query": "new release crashing on boot: config key absent", "runbook": "bad_deploy.md"}
+{"query": "heap keeps climbing for hours then container gets OOMKilled", "runbook": "memory_leak.md"}
+{"query": "java.lang.OutOfMemoryError: GC overhead limit exceeded", "runbook": "memory_leak.md"}
+{"query": "write failed: ENOSPC on /var/lib/data", "runbook": "disk_full.md"}
+{"query": "node has DiskPressure, kubelet evicting pods", "runbook": "disk_full.md"}
+{"query": "handshake error: cert not valid after 2026-10-01", "runbook": "tls_certificate_expiry.md"}
+{"query": "clients report SSL verify failure talking to api.internal", "runbook": "tls_certificate_expiry.md"}
+{"query": "lookup payments.svc.cluster.local: no such host", "runbook": "dns_resolution_failure.md"}
+{"query": "coredns pods crashlooping, name lookups failing", "runbook": "dns_resolution_failure.md"}
+{"query": "stripe answering HTTP 429, retry-after 30", "runbook": "upstream_rate_limiting.md"}
+{"query": "vendor api says quota exhausted for today", "runbook": "upstream_rate_limiting.md"}
+{"query": "kafka consumer lag at 2 million and rising on orders topic", "runbook": "message_queue_backlog.md"}
+{"query": "sqs queue depth growing, messages hours late", "runbook": "message_queue_backlog.md"}
+{"query": "redis ECONNRESET, cache hit rate dropped to zero", "runbook": "cache_outage.md"}
+{"query": "memcached cluster gone, db hammered by cache misses", "runbook": "cache_outage.md"}

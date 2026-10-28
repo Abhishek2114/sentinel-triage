@@ -64,7 +64,7 @@ flowchart LR
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
 | 6. Second model | LSTM autoencoder vs. Isolation Forest comparison | 🔲 |
-| 7. Deploy | Hosted demo, screenshots | 🔲 |
+| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide; hosted demo and screenshots to come | 🟡 |
 
 ## Results
 
@@ -210,6 +210,20 @@ The dashboard shows a timeline of anomalies and incidents per service, the incid
 resolved), and each incident's summary, next steps, ranked evidence and log lines. New and grouped
 incidents arrive over the WebSocket without a reload; on reconnect it refetches, so nothing is missed.
 
+## Deploy
+
+One small VPS runs the whole stack. Caddy terminates HTTPS and gets its own certificate; the API
+serves the built dashboard, and Postgres, Redis and the workers stay off the internet. With
+`DEMO_MODE=true` anyone can browse and press **Run demo**, while every write needs an API key.
+
+```bash
+cp deploy/.env.example deploy/.env   # domain, secrets, demo mode, optional LLM key
+docker compose -f deploy/docker-compose.prod.yml up -d --build
+```
+
+[docs/DEPLOY.md](docs/DEPLOY.md) walks through it step by step: server, DNS, firewall, secrets,
+checks, updates and backups.
+
 ## API (v1)
 
 | Method | Path | Purpose |
@@ -250,7 +264,8 @@ scripts/      synthetic log generator, run_eval.py
 eval/results  committed evaluation report (heldout.json)
 data/runbooks Markdown runbooks used for retrieval
 migrations/   Alembic schema migrations
-docs/         design document
+deploy/       production Compose file, Caddyfile, env template
+docs/         design document, VPS deploy guide
 ```
 
 ## Development

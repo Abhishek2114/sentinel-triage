@@ -30,7 +30,7 @@ from app.ingest.parser import parse_line
 from app.ingest.templates import extract_template, template_id
 from app.rag.embeddings import Embedder
 from app.rag.ingest_docs import RunbookChunk
-from app.rag.retriever import rank_in_memory, rank_runbooks
+from app.rag.retriever import RetrievalMode, RetrievedChunk, rank_chunks, rank_runbooks
 from app.triage.evidence import BASELINE_PERIOD, EvidenceEvent, build_evidence, evidence_window
 from app.triage.grouping import group_anomalies
 
@@ -76,14 +76,25 @@ class RunbookIndex:
 
     embedder: Embedder
     chunks: list[RunbookChunk]
+    mode: RetrievalMode = "dense"
     vectors: np.ndarray = field(init=False)
 
     def __post_init__(self) -> None:
         self.vectors = self.embedder.embed([c.text for c in self.chunks])
 
+    def ranked_runbooks(self, query: str, top_k: int = 4) -> list[str]:
+        """Runbooks best first, ranked exactly as ``retrieve`` ranks them."""
+        dense = self.vectors @ self.embedder.embed([query])[0]
+        texts = [c.text for c in self.chunks]
+        ranked = rank_chunks(self.mode, query, texts, dense, top_k)
+        hits = [
+            RetrievedChunk(self.chunks[i].source_doc, self.chunks[i].section, "", score)
+            for i, score in ranked
+        ]
+        return rank_runbooks(hits)
+
     def top_runbook(self, query: str) -> str | None:
-        hits = rank_in_memory(self.embedder.embed([query])[0], self.chunks, self.vectors)
-        docs = rank_runbooks(hits)
+        docs = self.ranked_runbooks(query)
         return docs[0] if docs else None
 
 

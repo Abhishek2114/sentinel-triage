@@ -1,0 +1,62 @@
+budget-like settings: none
+2026-10-27 20:03:59 [info     ] runbooks_indexed               chunks=0 embedder=hashing
+2026-10-27 20:03:59 [info     ] ingest_complete                errors=0 ingested=3000
+2026-10-27 20:03:59 [info     ] detection_complete             anomalies=25 new=25 services=25 windows=1000
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=1 incident_id=1 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=2 incident_id=2 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=3 incident_id=3 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=4 incident_id=4 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=5 incident_id=5 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=6 incident_id=6 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=7 incident_id=7 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=8 incident_id=8 method=llm runbook=None
+2026-10-27 20:03:59 [info     ] incident_opened                anomaly_id=9 incident_id=9 method=llm runbook=None
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=10 incident_id=10 method=llm runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=11 incident_id=11 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=12 incident_id=12 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=13 incident_id=13 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=14 incident_id=14 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=15 incident_id=15 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=16 incident_id=16 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=17 incident_id=17 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4538
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=18 incident_id=18 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=19 incident_id=19 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=20 incident_id=20 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=21 incident_id=21 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=22 incident_id=22 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4536
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=23 incident_id=23 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4537
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=24 incident_id=24 method=fallback runbook=None
+2026-10-27 20:04:00 [warning  ] llm_budget_exceeded            day=2026-10-27 reserve=4537
+2026-10-27 20:04:00 [warning  ] llm_triage_failed              error=BudgetExceededError: LLM budget for 2026-10-27 is spent model=counting-fake
+2026-10-27 20:04:00 [info     ] incident_opened                anomaly_id=25 incident_id=25 method=fallback runbook=None
+25 anomalies on 25 services → 10 LLM calls
+
+NOT REPRODUCED: LLM calls exceed the configured daily cap of 10

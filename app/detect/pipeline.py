@@ -7,6 +7,7 @@ database reads and idempotent writes, and is shared by the API and Celery.
 
 from __future__ import annotations
 
+import asyncio
 from collections import defaultdict
 from collections.abc import Callable, Sequence
 from dataclasses import dataclass, field, replace
@@ -17,6 +18,7 @@ from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.logging import get_logger
+from app.core.metrics import ANOMALIES, DETECTION_SECONDS, DETECTION_SKIPPED_SERVICES
 from app.detect.base import AnomalyResult, Detector
 from app.detect.error_burst import ErrorBurstDetector
 from app.detect.features import EventLike, EventPoint, WindowFeatures, aggregate_windows
@@ -32,6 +34,9 @@ DETECTORS: dict[str, Callable[[], Detector]] = {
     IForestDetector.name: IForestDetector,
 }
 DEFAULT_DETECTORS: tuple[str, ...] = tuple(DETECTORS)
+
+# Default cap on services scored per run (Settings.max_services_per_detection)
+MAX_SERVICES = 200
 
 # In the first windows of a series every template counts as "new", which looks
 # like a bad deploy. Those windows are used for fitting but never reported.
@@ -99,17 +104,22 @@ class Detections:
     services: list[str] = field(default_factory=list)
     windows_scored: int = 0
     anomalies: list[FoundAnomaly] = field(default_factory=list)
+    # Services left out because there were more than ``max_services``
+    skipped_services: int = 0
 
 
 def detect_events(
     events: Sequence[EventLike],
     detectors: Sequence[str] = DEFAULT_DETECTORS,
     window_minutes: int = 1,
+    max_services: int | None = MAX_SERVICES,
 ) -> Detections:
     """Group events by service, window them and run each detector.
 
     Pure and in-memory: the API, the Celery task and ``run_eval.py`` all go
     through here, so the evaluation measures exactly what production runs.
+    Each service costs one detector fit, and anyone who can ingest can invent
+    service names, so with ``max_services`` only the busiest are scored.
     """
     _check_detectors(detectors)
 
@@ -117,7 +127,13 @@ def detect_events(
     for event in events:
         by_service[event.service].append(event)
 
-    found = Detections(services=sorted(by_service))
+    skipped = 0
+    if max_services is not None and len(by_service) > max_services:
+        busiest = sorted(by_service, key=lambda s: (-len(by_service[s]), s))[:max_services]
+        skipped = len(by_service) - max_services
+        by_service = {s: by_service[s] for s in busiest}
+
+    found = Detections(services=sorted(by_service), skipped_services=skipped)
     for svc in found.services:
         windows = aggregate_windows(by_service[svc], window_minutes=window_minutes, service=svc)
         found.windows_scored += len(windows)
@@ -135,6 +151,7 @@ class DetectionSummary:
 
     services: list[str] = field(default_factory=list)
     windows_scored: int = 0
+    skipped_services: int = 0
     anomaly_ids: list[int] = field(default_factory=list)
     new_anomaly_ids: list[int] = field(default_factory=list)
     new_ids_by_detector: dict[str, list[int]] = field(default_factory=dict)
@@ -166,6 +183,7 @@ async def run_detection(
     until: datetime | None = None,
     service: str | None = None,
     window_minutes: int = 1,
+    max_services: int | None = MAX_SERVICES,
 ) -> DetectionSummary:
     """Detect anomalies in stored events and upsert them into ``anomalies``.
 
@@ -176,8 +194,21 @@ async def run_detection(
     _check_detectors(detectors)  # before touching the database
 
     events = await load_events(session, since, until, service)
-    found = detect_events(events, detectors, window_minutes)
-    summary = DetectionSummary(services=found.services, windows_scored=found.windows_scored)
+    # Model fitting is CPU work; in a thread it can't stall the event loop
+    with DETECTION_SECONDS.time():
+        found = await asyncio.to_thread(
+            detect_events, events, detectors, window_minutes, max_services
+        )
+    DETECTION_SKIPPED_SERVICES.inc(found.skipped_services)
+    summary = DetectionSummary(
+        services=found.services,
+        windows_scored=found.windows_scored,
+        skipped_services=found.skipped_services,
+    )
+    if found.skipped_services:
+        log.warning(
+            "detection_services_skipped", skipped=found.skipped_services, limit=max_services
+        )
 
     if found.anomalies:
         insert_stmt = insert(Anomaly).values(
@@ -211,6 +242,7 @@ async def run_detection(
             if inserted:
                 summary.new_anomaly_ids.append(anomaly_id)
                 summary.new_ids_by_detector.setdefault(detector, []).append(anomaly_id)
+                ANOMALIES.labels(detector).inc()
 
     await session.commit()
 

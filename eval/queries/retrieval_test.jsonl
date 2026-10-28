@@ -1,0 +1,50 @@
+{"query": "FATAL: too many clients already", "runbook": "db_connection_failure.md"}
+{"query": "hikari pool timed out waiting 30000ms for a connection", "runbook": "db_connection_failure.md"}
+{"query": "db failover in progress, app can't reach primary", "runbook": "db_connection_failure.md"}
+{"query": "password authentication failed for user app after secret rotation", "runbook": "db_connection_failure.md"}
+{"query": "connection leak: pool never gets connections back", "runbook": "db_connection_failure.md"}
+{"query": "request queue backing up, all workers saturated, slow responses", "runbook": "cpu_spike.md"}
+{"query": "load average 64 on an 8 core host, everything sluggish", "runbook": "cpu_spike.md"}
+{"query": "circuit breaker tripped after repeated upstream timeouts under heavy load", "runbook": "cpu_spike.md"}
+{"query": "SLA breach: responses taking 4s instead of 200ms, throttling kicked in", "runbook": "cpu_spike.md"}
+{"query": "hot loop burning cpu since traffic doubled", "runbook": "cpu_spike.md"}
+{"query": "panic: runtime error: index out of range after latest rollout", "runbook": "bad_deploy.md"}
+{"query": "500s began the minute the canary went to 100%", "runbook": "bad_deploy.md"}
+{"query": "health checks red since deploy, roll it back?", "runbook": "bad_deploy.md"}
+{"query": "schema mismatch: service expects api v3, peer sends v2", "runbook": "bad_deploy.md"}
+{"query": "feature flag flipped and now NullReferenceException in checkout", "runbook": "bad_deploy.md"}
+{"query": "RSS grows 50MB an hour, never released", "runbook": "memory_leak.md"}
+{"query": "container restarted with exit code 137", "runbook": "memory_leak.md"}
+{"query": "long gc pauses getting longer and longer", "runbook": "memory_leak.md"}
+{"query": "heap dump shows millions of cached session objects", "runbook": "memory_leak.md"}
+{"query": "memory usage warning at 92% and climbing", "runbook": "memory_leak.md"}
+{"query": "cannot create temp file: device is full", "runbook": "disk_full.md"}
+{"query": "postgres PANIC could not write to WAL file", "runbook": "disk_full.md"}
+{"query": "inode usage 100% on the logs volume", "runbook": "disk_full.md"}
+{"query": "pods evicted for ephemeral storage", "runbook": "disk_full.md"}
+{"query": "log files ate the whole partition overnight", "runbook": "disk_full.md"}
+{"query": "x509: certificate signed by unknown authority after renewal", "runbook": "tls_certificate_expiry.md"}
+{"query": "cert-manager failed to renew certificate for ingress", "runbook": "tls_certificate_expiry.md"}
+{"query": "browser warning: connection not private on dashboard host", "runbook": "tls_certificate_expiry.md"}
+{"query": "tls: bad certificate, SAN does not match hostname", "runbook": "tls_certificate_expiry.md"}
+{"query": "ssl peer certificate expired yesterday", "runbook": "tls_certificate_expiry.md"}
+{"query": "getaddrinfo EAI_AGAIN api.partner.com", "runbook": "dns_resolution_failure.md"}
+{"query": "SERVFAIL resolving internal hostnames from some nodes", "runbook": "dns_resolution_failure.md"}
+{"query": "first call to every host takes 5 seconds, then fine", "runbook": "dns_resolution_failure.md"}
+{"query": "kube-dns overloaded, ndots causing five lookups per request", "runbook": "dns_resolution_failure.md"}
+{"query": "service name stopped resolving after it was deleted and recreated", "runbook": "dns_resolution_failure.md"}
+{"query": "too many requests from the github api", "runbook": "upstream_rate_limiting.md"}
+{"query": "we are being throttled by the payments provider", "runbook": "upstream_rate_limiting.md"}
+{"query": "retry storm hammering the partner endpoint with no backoff", "runbook": "upstream_rate_limiting.md"}
+{"query": "api key shared by five services keeps hitting its limit", "runbook": "upstream_rate_limiting.md"}
+{"query": "batch import job triggered 429 responses from geocoding vendor", "runbook": "upstream_rate_limiting.md"}
+{"query": "consumer group keeps rebalancing, max poll interval exceeded", "runbook": "message_queue_backlog.md"}
+{"query": "one bad message retried forever blocks the partition", "runbook": "message_queue_backlog.md"}
+{"query": "rabbitmq queue has 400k ready messages, consumers can't keep up", "runbook": "message_queue_backlog.md"}
+{"query": "dead letter queue filling up fast", "runbook": "message_queue_backlog.md"}
+{"query": "producer blocked: buffer exhausted, broker not draining", "runbook": "message_queue_backlog.md"}
+{"query": "READONLY You can't write against a read only replica", "runbook": "cache_outage.md"}
+{"query": "redis OOM command not allowed, maxmemory reached", "runbook": "cache_outage.md"}
+{"query": "hot key expired and every request rebuilt it at once", "runbook": "cache_outage.md"}
+{"query": "elasticache failover, connection refused for 40 seconds", "runbook": "cache_outage.md"}
+{"query": "max number of clients reached on the cache server", "runbook": "cache_outage.md"}

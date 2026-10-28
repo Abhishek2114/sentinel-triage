@@ -41,6 +41,9 @@ class Incident(Base):
     status: Mapped[str] = mapped_column(
         String(32), nullable=False, default="open", server_default="open"
     )
+    # What fixed it, written when resolving; incident memory retrieves these
+    resolution: Mapped[str | None] = mapped_column(Text, nullable=True)
+    resolved_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), server_default=func.now())
     updated_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default=func.now(), onupdate=func.now()
@@ -59,6 +62,7 @@ class Incident(Base):
     __table_args__ = (
         # Grouping looks up the open incident for a service on every triage
         Index("ix_incidents_service_status", "service", "status"),
+        Index("ix_incidents_status_resolved_at", "status", "resolved_at"),
     )
 
     def __repr__(self) -> str:

@@ -14,12 +14,14 @@ from sqlalchemy import func, select, update
 from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.logging import get_logger
+from app.core.metrics import TRIAGE
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
 from app.rag.embeddings import Embedder
-from app.rag.retriever import runbook_context
+from app.rag.retriever import resolve_mode, runbook_context
 from app.rag.summarizer import LLMClient, TriageContext, summarize
 from app.realtime import EventType
 from app.triage.evidence import (
@@ -30,6 +32,7 @@ from app.triage.evidence import (
     evidence_window,
 )
 from app.triage.grouping import attach, find_open_incident, lock_service
+from app.triage.memory import similar_incidents
 
 log = get_logger(__name__)
 
@@ -132,10 +135,17 @@ async def triage(
     await session.commit()  # releases the service lock
     if outcome is not None:
         log.info("anomaly_grouped", anomaly_id=anomaly_id, incident_id=outcome.incident_id)
+        TRIAGE.labels(outcome.action, "none").inc()
         return outcome
 
     evidence = await load_evidence(session, anomaly)
-    runbooks = await runbook_context(session, embedder, evidence.query_text())
+    runbooks = await runbook_context(
+        session,
+        embedder,
+        evidence.query_text(),
+        mode=resolve_mode(get_settings().retrieval_mode, embedder),
+    )
+    past = await similar_incidents(session, evidence.query_text())
     ctx = TriageContext(
         detector=anomaly.detector,
         service=anomaly.service or "all services",
@@ -144,6 +154,7 @@ async def triage(
         score=anomaly.score,
         evidence=evidence,
         runbooks=runbooks,
+        past_incidents=past,
     )
     # End the read transaction: don't hold a connection "idle in transaction"
     # (or the service lock) for the seconds an LLM call can take
@@ -157,6 +168,7 @@ async def triage(
     if outcome is not None:
         await session.commit()
         log.info("anomaly_grouped_after_race", anomaly_id=anomaly_id)
+        TRIAGE.labels(outcome.action, "none").inc()
         return outcome
 
     evidence_json: list[dict[str, Any]] = [
@@ -194,4 +206,5 @@ async def triage(
         method=method,
         runbook=report.runbook,
     )
+    TRIAGE.labels("created", method).inc()
     return TriageOutcome(incident_id, "created", method)

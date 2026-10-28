@@ -1,0 +1,126 @@
+{
+  "embedder": "hashing",
+  "runbooks": 10,
+  "dev": {
+    "dense": {
+      "n": 20,
+      "hit@1": 0.5,
+      "hit@1_ci95": [
+        0.299,
+        0.701
+      ],
+      "hit@3": 0.75,
+      "mrr": 0.635
+    },
+    "bm25": {
+      "n": 20,
+      "hit@1": 0.75,
+      "hit@1_ci95": [
+        0.531,
+        0.888
+      ],
+      "hit@3": 1.0,
+      "mrr": 0.867
+    },
+    "char": {
+      "n": 20,
+      "hit@1": 0.7,
+      "hit@1_ci95": [
+        0.481,
+        0.855
+      ],
+      "hit@3": 1.0,
+      "mrr": 0.833
+    },
+    "hybrid": {
+      "n": 20,
+      "hit@1": 0.75,
+      "hit@1_ci95": [
+        0.531,
+        0.888
+      ],
+      "hit@3": 0.95,
+      "mrr": 0.842
+    },
+    "hybrid_dense": {
+      "n": 20,
+      "hit@1": 0.7,
+      "hit@1_ci95": [
+        0.481,
+        0.855
+      ],
+      "hit@3": 0.95,
+      "mrr": 0.821
+    }
+  },
+  "test": {
+    "dense": {
+      "n": 50,
+      "hit@1": 0.58,
+      "hit@1_ci95": [
+        0.442,
+        0.706
+      ],
+      "hit@3": 0.78,
+      "mrr": 0.71
+    },
+    "bm25": {
+      "n": 50,
+      "hit@1": 0.88,
+      "hit@1_ci95": [
+        0.762,
+        0.944
+      ],
+      "hit@3": 0.98,
+      "mrr": 0.932
+    },
+    "char": {
+      "n": 50,
+      "hit@1": 0.84,
+      "hit@1_ci95": [
+        0.715,
+        0.917
+      ],
+      "hit@3": 1.0,
+      "mrr": 0.917
+    },
+    "hybrid": {
+      "n": 50,
+      "hit@1": 0.84,
+      "hit@1_ci95": [
+        0.715,
+        0.917
+      ],
+      "hit@3": 0.98,
+      "mrr": 0.915
+    },
+    "hybrid_dense": {
+      "n": 50,
+      "hit@1": 0.84,
+      "hit@1_ci95": [
+        0.715,
+        0.917
+      ],
+      "hit@3": 0.98,
+      "mrr": 0.914
+    }
+  },
+  "test_paired": {
+    "hybrid_vs_dense": {
+      "only_first_right": 15,
+      "only_second_right": 2
+    },
+    "hybrid_vs_bm25": {
+      "only_first_right": 1,
+      "only_second_right": 3
+    },
+    "hybrid_vs_char": {
+      "only_first_right": 2,
+      "only_second_right": 2
+    },
+    "hybrid_dense_vs_hybrid": {
+      "only_first_right": 4,
+      "only_second_right": 4
+    }
+  }
+}

@@ -10,6 +10,7 @@ Features per window:
 
 from __future__ import annotations
 
+from bisect import bisect_left
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timedelta
@@ -40,6 +41,10 @@ class EventPoint:
     level: str
     template_id: str | None
 
+
+# Memory is one object per window of span (~300 bytes), so the span is capped:
+# two events years apart would otherwise allocate millions of windows
+MAX_WINDOWS = 14 * 24 * 60
 
 FEATURE_NAMES = [
     "event_count",
@@ -77,11 +82,14 @@ def aggregate_windows(
     events: Sequence[EventLike],
     window_minutes: int = 1,
     service: str | None = None,
+    max_windows: int = MAX_WINDOWS,
 ) -> list[WindowFeatures]:
     """Bucket events into fixed-width time windows and compute features.
 
     Pass ``service`` to build windows for one service only; otherwise all
     services are pooled together. Runs in O(n log n) – one sort, one pass.
+    If the events span more than ``max_windows`` windows, only the most
+    recent ``max_windows`` are built and older events are ignored.
     """
     if service is not None:
         events = [e for e in events if e.service == service]
@@ -92,6 +100,13 @@ def aggregate_windows(
     window_delta = timedelta(minutes=window_minutes)
     start = sorted_events[0].timestamp.replace(second=0, microsecond=0)
     n_windows = int((sorted_events[-1].timestamp - start) // window_delta) + 1
+    if n_windows > max_windows:
+        last = sorted_events[-1].timestamp.replace(second=0, microsecond=0)
+        cutoff = last - (max_windows - 1) * window_delta
+        keep_from = bisect_left([e.timestamp for e in sorted_events], cutoff)
+        sorted_events = sorted_events[keep_from:]
+        start = sorted_events[0].timestamp.replace(second=0, microsecond=0)
+        n_windows = int((sorted_events[-1].timestamp - start) // window_delta) + 1
 
     # One pass: drop each event straight into its bucket
     buckets: list[list[EventLike]] = [[] for _ in range(n_windows)]

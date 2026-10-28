@@ -1,0 +1,48 @@
+{
+  "data": "synthetic",
+  "recall": 1.0,
+  "recall_by_kind": {
+    "aws_access_key": 1.0,
+    "password": 1.0,
+    "bearer_token": 1.0,
+    "jwt": 1.0,
+    "github_token": 1.0,
+    "stripe_key": 1.0,
+    "anthropic_key": 1.0,
+    "email": 1.0,
+    "card": 1.0,
+    "url_password": 1.0
+  },
+  "false_positive_lines": {
+    "synthetic_run_lines": 7301,
+    "synthetic_run_changed": 0,
+    "tricky_benign_lines": 13,
+    "tricky_benign_changed": []
+  },
+  "hard_cases": [
+    {
+      "line": "login failed, password: correct horse battery staple",
+      "secret_removed": true
+    },
+    {
+      "line": "on-call phone +1 415 555 0100",
+      "secret_removed": false
+    },
+    {
+      "line": "account locked for Jane Doe",
+      "secret_removed": false
+    },
+    {
+      "line": "using secret 9f8e7d6c5b4a39281706f5e4d3c2b1a0",
+      "secret_removed": false
+    },
+    {
+      "line": "PGPASSWORD hunter2 psql -h db",
+      "secret_removed": false
+    },
+    {
+      "line": "login from 203.0.113.9",
+      "secret_removed": false
+    }
+  ]
+}

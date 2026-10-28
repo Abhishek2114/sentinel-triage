@@ -104,7 +104,8 @@ def build_evidence(
         if t is None:
             t = grouped[e.template_id] = TemplateEvidence(
                 template_id=e.template_id,
-                template=extract_template(e.message),
+                # First line only: a stack trace's frames are not the pattern
+                template=extract_template(e.message.split("\n", 1)[0]),
                 count=0,
                 baseline_count=baseline_counts.get(e.template_id, 0),
                 errors=0,

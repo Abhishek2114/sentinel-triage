@@ -14,7 +14,7 @@ from sqlalchemy.pool import NullPool
 
 from app.core.config import get_settings
 from app.core.logging import get_logger
-from app.detect.pipeline import DEFAULT_DETECTORS, DetectionSummary, run_detection
+from app.detect.pipeline import DetectionSummary, run_detection
 from app.rag.embeddings import get_embedder
 from app.rag.index import index_runbooks as index_runbooks_into
 from app.rag.summarizer import llm_from_settings
@@ -26,15 +26,20 @@ log = get_logger(__name__)
 
 
 @asynccontextmanager
-async def _session() -> AsyncIterator[AsyncSession]:
+async def _sessions() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
     # Each task runs in its own event loop (asyncio.run), and asyncpg connections
     # can't be shared across loops, so use a throwaway engine without pooling.
     engine = create_async_engine(get_settings().database_url, poolclass=NullPool)
     try:
-        async with async_sessionmaker(engine, expire_on_commit=False)() as session:
-            yield session
+        yield async_sessionmaker(engine, expire_on_commit=False)
     finally:
         await engine.dispose()
+
+
+@asynccontextmanager
+async def _session() -> AsyncIterator[AsyncSession]:
+    async with _sessions() as factory, factory() as session:
+        yield session
 
 
 async def _detect(
@@ -52,6 +57,7 @@ async def _detect(
             until=until,
             service=service,
             window_minutes=window_minutes,
+            max_services=get_settings().max_services_per_detection,
         )
 
 
@@ -78,7 +84,13 @@ def detect_anomalies(
 
     try:
         summary = asyncio.run(
-            _detect(since, until, service, window_minutes, detectors or list(DEFAULT_DETECTORS))
+            _detect(
+                since,
+                until,
+                service,
+                window_minutes,
+                detectors or get_settings().scheduled_detectors,
+            )
         )
     except (OSError, DBAPIError) as exc:  # database unreachable or restarting
         raise self.retry(exc=exc) from exc
@@ -103,12 +115,13 @@ def detect_anomalies(
 async def _triage(anomaly_id: int) -> TriageOutcome:
     settings = get_settings()
     embedder = await asyncio.to_thread(get_embedder, settings.embedding_model)
-    async with _session() as session:
+    async with _sessions() as factory, factory() as session:
         outcome = await triage(
             session,
             anomaly_id,
             embedder=embedder,
-            llm=llm_from_settings(settings),
+            # The spend guard's ledger is shared with the API through Postgres
+            llm=llm_from_settings(settings, factory),
             group_gap=timedelta(minutes=settings.incident_group_minutes),
         )
         if outcome.event is not None:

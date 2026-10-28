@@ -108,8 +108,24 @@ class IncidentRead(BaseModel):
     triage_method: Literal["llm", "fallback"]
     llm_model: str | None = None
     status: IncidentStatus
+    resolution: str | None = None
+    resolved_at: datetime | None = None
     created_at: datetime
     updated_at: datetime
+
+    model_config = {"from_attributes": True}
+
+
+class SimilarIncident(BaseModel):
+    """A resolved incident whose log patterns match (incident memory)."""
+
+    id: int
+    service: str | None
+    summary: str
+    runbook: str | None
+    resolution: str | None
+    resolved_at: datetime | None
+    score: float = Field(description="Reciprocal-rank-fusion score; higher = closer")
 
     model_config = {"from_attributes": True}
 
@@ -120,10 +136,19 @@ class IncidentDetail(IncidentRead):
     anomaly: AnomalyRead | None = None
     anomalies: list[AnomalyRead] = Field(default_factory=list)
     related_events: list[LogEventRead] | None = None
+    similar_incidents: list[SimilarIncident] = Field(default_factory=list)
 
 
 class IncidentUpdate(BaseModel):
     status: IncidentStatus
+    resolution: str | None = Field(
+        None, max_length=4000, description="What fixed it; incident memory shows this later"
+    )
+
+
+class RunbookRead(BaseModel):
+    name: str
+    markdown: str
 
 
 class RunbookIndexResponse(BaseModel):
@@ -150,6 +175,62 @@ class IngestResponse(BaseModel):
 
     ingested: int
     errors: int = 0
+
+
+# ── Overview / config ────────────────────────────────
+
+
+ServiceStatus = Literal["incident", "elevated", "healthy", "quiet"]
+VerdictLevel = Literal["incident", "warning", "ok", "no_data"]
+
+
+class ServiceHealth(BaseModel):
+    service: str
+    status: ServiceStatus
+    events: int
+    errors: int
+    error_rate: float
+    last_seen: datetime | None
+    open_incident_id: int | None = None
+    # Errors per minute over the window, oldest first
+    errors_per_minute: list[int]
+    events_per_minute: list[int]
+
+
+class Verdict(BaseModel):
+    level: VerdictLevel
+    headline: str
+    detail: str
+
+
+class Overview(BaseModel):
+    verdict: Verdict
+    as_of: datetime
+    # True when there is no recent data and the window was moved to the
+    # newest stored event (replayed or historical logs)
+    anchored: bool
+    window_minutes: int
+    services: list[ServiceHealth]
+    services_truncated: bool
+    open_incidents: list[IncidentRead]
+
+
+class PublicConfig(BaseModel):
+    version: str
+    demo_mode: bool
+    read_requires_key: bool
+    write_requires_key: bool
+    llm_provider: str | None
+    llm_calls_today: int
+    llm_calls_limit: int
+
+
+class DemoRunResponse(BaseModel):
+    status: Literal["started"]
+    lines: int
+    services: list[str]
+    fault: str
+    detail: str
 
 
 # ── Health ────────────────────────────────────────────

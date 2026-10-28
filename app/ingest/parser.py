@@ -55,6 +55,21 @@ _LEVEL_WORD_PATTERN = re.compile(
 )
 
 
+_SERVICE_BAD_CHARS = re.compile(r"[^A-Za-z0-9._/-]+")
+MAX_SERVICE_CHARS = 64
+
+
+def sanitize_service(raw: str) -> str:
+    """A service name safe to store, display and put in a prompt.
+
+    JSON logs can name a service anything, including newlines and markup.
+    Names are cut to one token of ``[A-Za-z0-9._/-]``, the same characters the
+    ISO and syslog formats accept, so every format yields the same kind of name.
+    """
+    cleaned = _SERVICE_BAD_CHARS.sub("-", raw.strip()).strip("-./")
+    return cleaned[:MAX_SERVICE_CHARS] or "unknown"
+
+
 def normalise_level(raw: str) -> str:
     """Map variant level names to canonical values."""
     return _LEVEL_KEYWORDS.get(raw.lower(), raw.upper())
@@ -96,6 +111,16 @@ def _parse_syslog_timestamp(raw: str) -> datetime:
     return now
 
 
+def is_structured(line: str) -> bool:
+    """Does the line start a new event in one of the known formats?"""
+    line = line.strip()
+    return (
+        line.startswith("{")
+        or _ISO_PATTERN.match(line) is not None
+        or _SYSLOG_PATTERN.match(line) is not None
+    )
+
+
 def parse_line(line: str) -> LogEventCreate | None:
     """Parse a single log line into a LogEventCreate, or None if unparseable."""
     try:
@@ -114,11 +139,14 @@ def _parse_line(line: str) -> LogEventCreate | None:
     if line.startswith("{"):
         try:
             data = json.loads(line)
+            message = str(data.get("message", ""))
+            level = data.get("level")
             return LogEventCreate(
                 timestamp=_parse_iso_timestamp(str(data.get("timestamp", ""))),
-                service=str(data.get("service", "unknown")),
-                level=normalise_level(str(data.get("level", "INFO"))),
-                message=str(data.get("message", "")),
+                service=sanitize_service(str(data.get("service", "unknown"))),
+                # Shippers that wrap plain lines can't know the level; guess it
+                level=normalise_level(str(level)) if level else _guess_level_from_message(message),
+                message=message,
                 raw_line=line,
             )
         except (json.JSONDecodeError, KeyError):
@@ -129,7 +157,7 @@ def _parse_line(line: str) -> LogEventCreate | None:
     if m:
         return LogEventCreate(
             timestamp=_parse_iso_timestamp(m.group("timestamp")),
-            service=m.group("service"),
+            service=sanitize_service(m.group("service")),
             level=normalise_level(m.group("level")),
             message=m.group("message"),
             raw_line=line,
@@ -140,7 +168,7 @@ def _parse_line(line: str) -> LogEventCreate | None:
     if m:
         return LogEventCreate(
             timestamp=_parse_syslog_timestamp(m.group("timestamp")),
-            service=m.group("service"),
+            service=sanitize_service(m.group("service")),
             level=_guess_level_from_message(m.group("message")),
             message=m.group("message"),
             raw_line=line,

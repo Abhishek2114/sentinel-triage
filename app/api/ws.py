@@ -7,6 +7,8 @@ Each API process keeps its own set of sockets. Events reach them through
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.core.logging import get_logger
+from app.core.metrics import WS_CONNECTIONS
+from app.core.security import websocket_authorized
 
 router = APIRouter(tags=["websocket"])
 log = get_logger(__name__)
@@ -19,7 +21,11 @@ _connections: set[WebSocket] = set()
 async def alert_stream(websocket: WebSocket) -> None:
     """Stream new incidents to connected dashboard clients."""
     await websocket.accept()
+    if not await websocket_authorized(websocket):
+        await websocket.close(code=4401, reason="unauthorized")
+        return
     _connections.add(websocket)
+    WS_CONNECTIONS.inc()
     log.info("ws_client_connected", total=len(_connections))
 
     try:
@@ -31,6 +37,7 @@ async def alert_stream(websocket: WebSocket) -> None:
     finally:
         # Also runs on unexpected errors, so dead sockets never stay registered
         _connections.discard(websocket)
+        WS_CONNECTIONS.dec()
         log.info("ws_client_disconnected", total=len(_connections))
 
 

@@ -1,0 +1,23 @@
+# HTTPS for the whole app. Caddy gets and renews a Let's Encrypt certificate
+# for $DOMAIN on its own; with DOMAIN=localhost it uses a local test CA.
+{
+	email {$ACME_EMAIL}
+}
+
+{$DOMAIN} {
+	encode zstd gzip
+
+	header {
+		Strict-Transport-Security "max-age=31536000; includeSubDomains"
+		-Server
+	}
+
+	# REST, the WebSocket at /api/v1/ws/alerts and the dashboard all live on
+	# the API. UPSTREAM is only overridden when running Caddy outside Compose.
+	reverse_proxy {$UPSTREAM:api:8000}
+
+	log {
+		output stdout
+		format console
+	}
+}

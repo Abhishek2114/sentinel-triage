@@ -27,11 +27,13 @@ htmlcov/
 # Data
 data/synthetic/*.log
 data/synthetic/*.jsonl
-eval/results/*.json
-!eval/results/heldout.json
+eval/results/*.log
 
 # Docker
 *.pid
+
+# Machine-specific editor/agent config
+.claude/
 
 # OS
 .DS_Store

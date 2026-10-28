@@ -137,8 +137,14 @@ def generate_logs(
     events_per_minute: int = 20,
     fault_count: int = 4,
     seed: int = 42,
+    start_time: datetime | None = None,
+    service_prefix: str = "",
 ) -> tuple[list[str], list[dict]]:
     """Generate synthetic log lines and fault labels.
+
+    ``start_time`` defaults to a fixed date so evaluation runs reproduce byte
+    for byte; the live demo passes "an hour ago" and a ``demo-`` prefix so its
+    data is recent and visibly synthetic.
 
     Returns:
         (log_lines, labels) where labels are dicts with fault metadata.
@@ -147,7 +153,8 @@ def generate_logs(
     lines: list[str] = []
     labels: list[dict] = []
 
-    start_time = datetime(2024, 6, 15, 0, 0, 0, tzinfo=UTC)
+    start_time = start_time or datetime(2024, 6, 15, 0, 0, 0, tzinfo=UTC)
+    services = [service_prefix + s for s in SERVICES]
     total_minutes = duration_hours * 60
 
     # Plan fault windows (non-overlapping, spread across the timeline)
@@ -164,7 +171,7 @@ def generate_logs(
         fault_start = (i + 1) * gap
         # Cap duration at the gap so windows never overlap on short runs
         fault_duration = max(1, min(random.randint(5, 15), gap - 1))
-        fault_service = random.choice(SERVICES)
+        fault_service = random.choice(services)
         fault_windows.append({
             "type": ft,
             "start_minute": fault_start,
@@ -195,7 +202,7 @@ def generate_logs(
 
         for _ in range(max(1, n_events)):
             ts = current_time + timedelta(seconds=random.uniform(0, 59.999))
-            service = random.choice(SERVICES)
+            service = random.choice(services)
 
             if active_fault and service == active_fault["service"]:
                 # Fault mode for the affected service

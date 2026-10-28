@@ -101,3 +101,31 @@ jobs:
 
       - name: Build Docker images
         run: docker compose build api worker dashboard
+
+      # The same stack docs/DEPLOY.md puts on a VPS, with Caddy's local CA for localhost
+      - name: Start the production stack
+        run: |
+          cp deploy/.env.example deploy/.env
+          sed -i -e 's/^DOMAIN=.*/DOMAIN=localhost/' \
+                 -e 's/^ACME_EMAIL=.*/ACME_EMAIL=ci@example.com/' \
+                 -e "s/^POSTGRES_PASSWORD=.*/POSTGRES_PASSWORD=$(openssl rand -hex 32)/" \
+                 -e 's/^API_KEYS=.*/API_KEYS=["ci-test-key"]/' deploy/.env
+          docker compose -f deploy/docker-compose.prod.yml up -d --build --wait --wait-timeout 300
+
+      - name: Smoke-test it over HTTPS
+        run: |
+          B=https://localhost
+          code() { curl -ks -o /dev/null -w '%{http_code}' "$@"; }
+          curl -ksf --retry 15 --retry-delay 2 --retry-all-errors $B/api/v1/health | grep -q '"db":"connected"'
+          test "$(code $B/)" = 200                                   # dashboard served by the API
+          test "$(code $B/docs)" = 404                               # no API docs in production
+          test "$(code -X POST $B/api/v1/detect -H 'Content-Type: application/json' -d '{}')" = 401
+          test "$(code -X POST $B/api/v1/detect -H 'Authorization: Bearer ci-test-key' -H 'Content-Type: application/json' -d '{}')" = 200
+          test "$(code -X POST $B/api/v1/demo/run)" = 202            # public demo button
+          for i in $(seq 1 30); do curl -ks $B/api/v1/incidents | grep -q '"service":"demo-' && break; sleep 2; done
+          curl -ks $B/api/v1/incidents | grep -q '"service":"demo-'  # the demo produced an incident
+          docker compose -f deploy/docker-compose.prod.yml ps
+
+      - name: Show logs on failure
+        if: failure()
+        run: docker compose -f deploy/docker-compose.prod.yml logs --tail 200

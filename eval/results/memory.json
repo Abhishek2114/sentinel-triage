@@ -1,0 +1,25 @@
+{
+  "data": "synthetic",
+  "history_incidents": 70,
+  "history_by_fault": {
+    "cpu_spike": 19,
+    "memory_leak": 14,
+    "bad_deploy": 21,
+    "db_connection_failure": 16
+  },
+  "query_incidents": 176,
+  "query_incidents_with_fault": 171,
+  "memory": {
+    "answered": 171,
+    "abstained": 0,
+    "top1_same_fault_of_answered": 1.0,
+    "top1_same_fault_of_all": 1.0,
+    "any_of_top3_same_fault_of_all": 1.0
+  },
+  "baselines": {
+    "most_recent_same_service": 0.275,
+    "random_past_incident_expected": 0.251
+  },
+  "false_alarm_queries": 5,
+  "false_alarms_with_no_match": 0
+}

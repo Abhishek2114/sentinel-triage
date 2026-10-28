@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import { runbookTitle } from "../components/IncidentList";
-import { formatDuration, formatTime, plural } from "../format";
+import { formatAgo, formatDuration, formatTime, percent, plural, runbookTitle } from "../format";
 import {
   filterIncidents,
   mergeIncidents,
@@ -77,8 +76,18 @@ describe("formatting", () => {
   });
 
   it("titles runbooks with acronyms", () => {
-    expect(runbookTitle("db_connection_failure.md")).toBe("DB Connection Failure");
-    expect(runbookTitle("cpu_spike.md")).toBe("CPU Spike");
-    expect(runbookTitle(null)).toBe("No runbook matched");
+    expect(runbookTitle("db_connection_failure.md")).toBe("DB connection failure");
+    expect(runbookTitle("cpu_spike.md")).toBe("CPU spike");
+    expect(runbookTitle(null)).toBeNull();
+  });
+
+  it("formats relative times and rates for the board", () => {
+    const now = Date.parse("2026-10-27T12:00:00Z");
+    expect(formatAgo("2026-10-27T11:59:40Z", now)).toBe("just now");
+    expect(formatAgo("2026-10-27T11:55:00Z", now)).toBe("5 min ago");
+    expect(formatAgo("2026-10-27T09:00:00Z", now)).toBe("3 h ago");
+    expect(percent(0)).toBe("0%");
+    expect(percent(0.004)).toBe("<1%");
+    expect(percent(0.256)).toBe("26%");
   });
 });

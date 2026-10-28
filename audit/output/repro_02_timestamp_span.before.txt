@@ -1,0 +1,10 @@
+2026-10-27 20:05:36 [info     ] ingest_complete                errors=0 ingested=1
+/ingest stored timestamp 9999-12-31T23:59:00+00:00
+span   1d:    1441 windows, peak     0.4 MB, 0.03s
+span   7d:   10081 windows, peak     3.1 MB, 0.23s
+span  30d:   43201 windows, peak    13.1 MB, 1.16s
+full detect_events over a 30-day span from 2 events: 0.8s
+span 365d: 525601 windows, peak 161 MB (actually run)
+span to year 9999: 4.19e+09 windows ≈ 1 TB (extrapolated, not run)
+
+REPRODUCED: far-future timestamps accepted and detection memory grows with the timestamp span

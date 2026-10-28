@@ -1,0 +1,55 @@
+{
+  "note": "Runbook hit rate on log-derived queries (evidence templates of caught faults), generator seeds 1-20 (dev; disjoint from held-out 1000-1049). Synthetic data, 10 runbooks.",
+  "results": {
+    "hashing/dense": {
+      "hit_rate": 0.925,
+      "misses": 5,
+      "evaluated": 67
+    },
+    "hashing/bm25": {
+      "hit_rate": 1.0,
+      "misses": 0,
+      "evaluated": 67
+    },
+    "hashing/char": {
+      "hit_rate": 0.94,
+      "misses": 4,
+      "evaluated": 67
+    },
+    "hashing/hybrid": {
+      "hit_rate": 0.985,
+      "misses": 1,
+      "evaluated": 67
+    },
+    "hashing/hybrid_dense": {
+      "hit_rate": 0.955,
+      "misses": 3,
+      "evaluated": 67
+    },
+    "all-MiniLM-L6-v2/dense": {
+      "hit_rate": 0.746,
+      "misses": 17,
+      "evaluated": 67
+    },
+    "all-MiniLM-L6-v2/bm25": {
+      "hit_rate": 1.0,
+      "misses": 0,
+      "evaluated": 67
+    },
+    "all-MiniLM-L6-v2/char": {
+      "hit_rate": 0.94,
+      "misses": 4,
+      "evaluated": 67
+    },
+    "all-MiniLM-L6-v2/hybrid": {
+      "hit_rate": 0.985,
+      "misses": 1,
+      "evaluated": 67
+    },
+    "all-MiniLM-L6-v2/hybrid_dense": {
+      "hit_rate": 0.985,
+      "misses": 1,
+      "evaluated": 67
+    }
+  }
+}

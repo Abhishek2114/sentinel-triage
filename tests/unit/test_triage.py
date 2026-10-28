@@ -93,12 +93,14 @@ class TestSplitRunbook:
 
     def test_repo_runbooks(self):
         chunks = load_runbooks("data/runbooks")
-        assert {c.source_doc for c in chunks} == {
+        # One runbook per synthetic fault type, plus distractors for the retrieval eval
+        assert {c.source_doc for c in chunks} >= {
             "bad_deploy.md",
             "cpu_spike.md",
             "db_connection_failure.md",
             "memory_leak.md",
         }
+        assert len({c.source_doc for c in chunks}) == 10
         assert all(
             any(c.section == "Remediation" for c in chunks if c.source_doc == d)
             for d in {c.source_doc for c in chunks}

@@ -1,0 +1,3893 @@
+{
+  "source": {
+    "generator": {
+      "seeds": [
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018,
+        1019,
+        1020,
+        1021,
+        1022,
+        1023,
+        1024,
+        1025,
+        1026,
+        1027,
+        1028,
+        1029,
+        1030,
+        1031,
+        1032,
+        1033,
+        1034,
+        1035,
+        1036,
+        1037,
+        1038,
+        1039,
+        1040,
+        1041,
+        1042,
+        1043,
+        1044,
+        1045,
+        1046,
+        1047,
+        1048,
+        1049
+      ],
+      "hours": 6,
+      "events_per_minute": 20,
+      "faults_per_run": 4
+    }
+  },
+  "retrieval_mode": "hybrid",
+  "runbooks": 10,
+  "window_minutes": 1,
+  "detectors": [
+    {
+      "detector": "error_burst",
+      "precision": 0.9695,
+      "recall": 0.855,
+      "f1": 0.9087,
+      "mttd_seconds": 246.3,
+      "median_ttd_seconds": 240.0,
+      "false_alarms_per_day": 0.48,
+      "anomalies": 197,
+      "true_positives": 191,
+      "faults": 200,
+      "detected": 171,
+      "hours": 299.85,
+      "recall_by_fault_type": {
+        "bad_deploy": {
+          "detected": 46,
+          "total": 49
+        },
+        "cpu_spike": {
+          "detected": 37,
+          "total": 43
+        },
+        "db_connection_failure": {
+          "detected": 50,
+          "total": 51
+        },
+        "memory_leak": {
+          "detected": 38,
+          "total": 57
+        }
+      }
+    }
+  ],
+  "triage": {
+    "detector": "error_burst",
+    "embedder": "all-MiniLM-L6-v2",
+    "runbook_hit_rate": 1.0,
+    "evaluated": 171,
+    "by_fault_type": {
+      "bad_deploy": {
+        "hit": 46,
+        "total": 46
+      },
+      "cpu_spike": {
+        "hit": 37,
+        "total": 37
+      },
+      "db_connection_failure": {
+        "hit": 50,
+        "total": 50
+      },
+      "memory_leak": {
+        "hit": 38,
+        "total": 38
+      }
+    },
+    "misses": []
+  },
+  "incidents": [
+    {
+      "grouping": "none",
+      "incidents": 197,
+      "faults_caught": 171,
+      "incidents_per_caught_fault": 1.117,
+      "duplicates": 20,
+      "merged": 0,
+      "false_incidents": 6
+    },
+    {
+      "grouping": "15 min",
+      "incidents": 176,
+      "faults_caught": 171,
+      "incidents_per_caught_fault": 1.0,
+      "duplicates": 0,
+      "merged": 0,
+      "false_incidents": 5
+    }
+  ],
+  "runs": [
+    {
+      "run": "seed 1000",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1001",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1002",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1003",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 280.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1004",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 2,
+            "total": 2
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1005",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.8,
+          "recall": 0.75,
+          "f1": 0.7742,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1006",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 315.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1007",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1008",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 140.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1009",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1010",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1011",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1012",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1013",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.5,
+          "f1": 0.6,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 2,
+        "by_fault_type": {
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1014",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1015",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1016",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1017",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1018",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1019",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 320.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1020",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 225.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1021",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1022",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1023",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1024",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1025",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1026",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 195.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1027",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6667,
+          "mttd_seconds": 120.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 2,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 2,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1028",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 440.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1029",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 315.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1030",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 345.0,
+          "median_ttd_seconds": 330.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 2,
+            "total": 2
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1031",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 345.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1032",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.5,
+          "f1": 0.6667,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 2,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 2,
+          "faults_caught": 2,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 2,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1033",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.667,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1034",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1035",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1036",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1037",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1038",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1039",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 165.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1040",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1041",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1042",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 0.8,
+          "recall": 0.75,
+          "f1": 0.7742,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 1
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 1
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1043",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 4,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.333,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1044",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1045",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 5,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 5,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.25,
+          "duplicates": 1,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1046",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1047",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 255.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 6,
+          "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 6,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.5,
+          "duplicates": 2,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 4,
+          "faults_caught": 4,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 4,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 2,
+            "total": 2
+          },
+          "db_connection_failure": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1048",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "db_connection_failure": {
+            "hit": 2,
+            "total": 2
+          }
+        },
+        "misses": []
+      }
+    },
+    {
+      "run": "seed 1049",
+      "detectors": [
+        {
+          "detector": "error_burst",
+          "precision": 1.0,
+          "recall": 0.75,
+          "f1": 0.8571,
+          "mttd_seconds": 340.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 3,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 0,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        }
+      ],
+      "incidents": [
+        {
+          "grouping": "none",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        },
+        {
+          "grouping": "15 min",
+          "incidents": 3,
+          "faults_caught": 3,
+          "incidents_per_caught_fault": 1.0,
+          "duplicates": 0,
+          "merged": 0,
+          "false_incidents": 0
+        }
+      ],
+      "triage": {
+        "detector": "error_burst",
+        "embedder": "all-MiniLM-L6-v2",
+        "runbook_hit_rate": 1.0,
+        "evaluated": 3,
+        "by_fault_type": {
+          "bad_deploy": {
+            "hit": 1,
+            "total": 1
+          },
+          "cpu_spike": {
+            "hit": 1,
+            "total": 1
+          },
+          "memory_leak": {
+            "hit": 1,
+            "total": 1
+          }
+        },
+        "misses": []
+      }
+    }
+  ]
+}

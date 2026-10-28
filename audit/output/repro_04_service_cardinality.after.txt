@@ -1,0 +1,5 @@
+  10 services x 10 events: 10 series, detect   1.69s
+ 100 services x 10 events: 100 series, detect  17.72s
+ 500 services x 10 events: 200 series, detect  34.61s
+
+NOT REPRODUCED: service-name cardinality is unbounded (linear detector cost)

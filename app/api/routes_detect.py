@@ -4,7 +4,9 @@ from fastapi import APIRouter, Depends
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.db import get_session
+from app.core.security import require_key
 from app.detect.pipeline import run_detection
 from app.models.anomaly import Anomaly
 from app.schemas import AnomalyRead, DetectRequest, DetectResponse
@@ -12,7 +14,9 @@ from app.schemas import AnomalyRead, DetectRequest, DetectResponse
 router = APIRouter(tags=["detect"])
 
 
-@router.post("/detect", response_model=DetectResponse)
+@router.post(
+    "/detect", response_model=DetectResponse, dependencies=[Depends(require_key)]
+)
 async def detect(
     body: DetectRequest,
     session: AsyncSession = Depends(get_session),
@@ -30,6 +34,7 @@ async def detect(
         until=body.until,
         service=body.service,
         window_minutes=body.window_minutes,
+        max_services=get_settings().max_services_per_detection,
     )
 
     anomalies: list[Anomaly] = []

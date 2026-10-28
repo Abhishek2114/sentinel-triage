@@ -1,0 +1,12 @@
+2026-10-27 20:02:29 [info     ] ingest_complete                errors=0 ingested=7
+order-service  ERROR    lines=1  'Unhandled exception in checkout'
+unknown        INFO     lines=1  'java.lang.NullPointerException: cart was null'
+unknown        INFO     lines=1  'at com.shop.Checkout.total(Checkout.java:42)'
+unknown        INFO     lines=1  'at com.shop.Api.handle(Api.java:17)'
+unknown        INFO     lines=1  'Caused by: java.io.IOException: stream closed'
+unknown        INFO     lines=1  '... 12 more'
+order-service  INFO     lines=1  'request ok'
+
+7 lines → 7 stored events; 5 under service 'unknown'
+
+REPRODUCED: stack-trace continuation lines become separate 'unknown' events

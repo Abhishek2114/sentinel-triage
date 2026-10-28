@@ -7,6 +7,7 @@ from sqlalchemy.orm import selectinload
 
 from app.api.deps import get_redis_factory
 from app.core.db import get_session
+from app.core.security import require_key, require_read_access
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
@@ -18,7 +19,9 @@ from app.schemas import (
     IncidentStatus,
     IncidentUpdate,
     LogEventRead,
+    SimilarIncident,
 )
+from app.triage.memory import incident_patterns, similar_incidents
 
 router = APIRouter(tags=["incidents"])
 
@@ -26,7 +29,11 @@ router = APIRouter(tags=["incidents"])
 # ── Anomalies ─────────────────────────────────────────
 
 
-@router.get("/anomalies", response_model=list[AnomalyRead])
+@router.get(
+    "/anomalies",
+    response_model=list[AnomalyRead],
+    dependencies=[Depends(require_read_access)],
+)
 async def list_anomalies(
     detector: str | None = Query(None),
     service: str | None = Query(None),
@@ -48,7 +55,11 @@ async def list_anomalies(
 # ── Incidents ─────────────────────────────────────────
 
 
-@router.get("/incidents", response_model=list[IncidentRead])
+@router.get(
+    "/incidents",
+    response_model=list[IncidentRead],
+    dependencies=[Depends(require_read_access)],
+)
 async def list_incidents(
     status: IncidentStatus | None = Query(None),
     service: str | None = Query(None),
@@ -76,7 +87,11 @@ async def _load_incident(session: AsyncSession, incident_id: int) -> Incident:
     return incident
 
 
-@router.get("/incidents/{incident_id}", response_model=IncidentDetail)
+@router.get(
+    "/incidents/{incident_id}",
+    response_model=IncidentDetail,
+    dependencies=[Depends(require_read_access)],
+)
 async def get_incident(
     incident_id: int,
     session: AsyncSession = Depends(get_session),
@@ -96,10 +111,20 @@ async def get_incident(
 
     detail = IncidentDetail.model_validate(incident)
     detail.related_events = [LogEventRead.model_validate(e) for e in related_events]
+    detail.similar_incidents = [
+        SimilarIncident.model_validate(p)
+        for p in await similar_incidents(
+            session, incident_patterns(incident.evidence), exclude_id=incident.id
+        )
+    ]
     return detail
 
 
-@router.patch("/incidents/{incident_id}", response_model=IncidentRead)
+@router.patch(
+    "/incidents/{incident_id}",
+    response_model=IncidentRead,
+    dependencies=[Depends(require_key)],
+)
 async def update_incident(
     incident_id: int,
     body: IncidentUpdate,
@@ -108,12 +133,17 @@ async def update_incident(
 ) -> Incident:
     """Resolve or reopen an incident. Resolved incidents no longer absorb new anomalies."""
     incident = await _load_incident(session, incident_id)
-    if incident.status != body.status:
-        await session.execute(
-            update(Incident)
-            .where(Incident.id == incident_id)
-            .values(status=body.status, updated_at=func.now())
-        )
+    resolving = body.status == "resolved"
+    note_changed = resolving and body.resolution is not None
+    if incident.status != body.status or note_changed:
+        values: dict[str, object] = {"status": body.status, "updated_at": func.now()}
+        if resolving and incident.status != "resolved":
+            values["resolved_at"] = func.now()
+        if not resolving:
+            values["resolved_at"] = None
+        if body.resolution is not None:
+            values["resolution"] = body.resolution.strip() or None
+        await session.execute(update(Incident).where(Incident.id == incident_id).values(**values))
         await session.commit()
         await publish_incident(session, redis, incident_id, "incident.updated")
     # populate_existing: the session already holds this row with the old status

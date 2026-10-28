@@ -1,0 +1,7 @@
+2026-10-27 20:04:38 [info     ] ingest_complete                errors=0 ingested=2 multiline_joined=5
+order-service  ERROR    lines=6  'Unhandled exception in checkout'
+order-service  INFO     lines=1  'request ok'
+
+7 lines → 2 stored events; 0 under service 'unknown'
+
+NOT REPRODUCED: stack-trace continuation lines become separate 'unknown' events

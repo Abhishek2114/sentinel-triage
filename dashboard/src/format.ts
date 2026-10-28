@@ -34,3 +34,29 @@ export function formatDuration(startIso: string, endIso: string): string {
 export function plural(n: number, one: string, many = `${one}s`): string {
   return `${n} ${n === 1 ? one : many}`;
 }
+
+export function formatAgo(iso: string, now: number = Date.now()): string {
+  const seconds = Math.max(0, Math.round((now - Date.parse(iso)) / 1000));
+  if (seconds < 60) return "just now";
+  const minutes = Math.round(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.round(minutes / 60);
+  if (hours < 48) return `${hours} h ago`;
+  return `${Math.round(hours / 24)} days ago`;
+}
+
+export function percent(rate: number): string {
+  if (rate === 0) return "0%";
+  return rate < 0.01 ? "<1%" : `${Math.round(rate * 100)}%`;
+}
+
+/** "db_connection_failure.md" → "DB connection failure" */
+export function runbookTitle(name: string | null): string | null {
+  if (!name) return null;
+  const words = name.replace(/\.md$/, "").split("_");
+  const acronyms = new Set(["db", "tls", "dns", "cpu"]);
+  const first = acronyms.has(words[0])
+    ? words[0].toUpperCase()
+    : words[0].charAt(0).toUpperCase() + words[0].slice(1);
+  return [first, ...words.slice(1)].join(" ");
+}

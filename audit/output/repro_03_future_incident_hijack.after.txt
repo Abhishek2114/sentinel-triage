@@ -1,0 +1,7 @@
+2026-10-27 20:02:55 [info     ] ingest_complete                errors=0 ingested=180 timestamp_clamped=180
+ingest future-dated: 200 {'ingested': 180, 'errors': 0}
+2026-10-27 20:02:55 [info     ] runbooks_indexed               chunks=0 embedder=hashing
+2026-10-27 20:02:55 [info     ] detection_complete             anomalies=0 new=0 services=1 windows=1
+anomalies after attacker burst: []
+
+NOT REPRODUCED: the future-dated burst produced no anomaly to hijack with

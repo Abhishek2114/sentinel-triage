@@ -1,0 +1,10 @@
+2026-10-27 20:02:00 [info     ] ingest_complete                errors=0 ingested=100000
+ingest 100000 lines: HTTP 200 in 4.35s; longest /health gap 102 ms over 129 probes
+ingest throughput: 23,007 lines/s (one request, in-process)
+2026-10-27 20:02:02 [info     ] detection_complete             anomalies=5 new=5 services=5 windows=1675
+detect: HTTP 200 in 1.78s; longest /health gap 1585 ms over 12 probes
+2026-10-27 20:02:02 [info     ] ingest_complete                errors=0 ingested=6000
+2026-10-27 20:02:25 [info     ] detection_complete             anomalies=5 new=0 services=105 windows=4775
+detect, 100 services: HTTP 200 in 22.69s; longest /health gap 22462 ms over 12 probes
+
+REPRODUCED: event loop blocked > 1s by request CPU work

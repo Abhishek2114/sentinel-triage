@@ -1,0 +1,14 @@
+2026-10-27 19:59:53 [info     ] ingest_complete                errors=0 ingested=180
+ingest future-dated: 200 {'ingested': 180, 'errors': 0}
+2026-10-27 19:59:53 [info     ] runbooks_indexed               chunks=0 embedder=hashing
+2026-10-27 19:59:53 [info     ] detection_complete             anomalies=1 new=1 services=1 windows=30
+anomalies after attacker burst: [(1, '2026-10-28T14:24:00Z')]
+2026-10-27 19:59:53 [info     ] incident_opened                anomaly_id=1 incident_id=1 method=fallback runbook=None
+attacker incident #1 last_seen_at=2026-10-28T14:29:00Z
+2026-10-27 19:59:53 [info     ] ingest_complete                errors=0 ingested=360
+2026-10-27 19:59:53 [info     ] detection_complete             anomalies=2 new=1 services=1 windows=1500
+real anomalies: [(2, '2026-10-27T14:19:00Z')]
+2026-10-27 19:59:53 [info     ] incident_opened                anomaly_id=2 incident_id=2 method=fallback runbook=None
+triage of the real fault: HTTP 201, incident #2
+
+NOT REPRODUCED: real fault absorbed into a future-dated attacker incident (no new page)

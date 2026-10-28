@@ -1,6 +1,6 @@
 [project]
 name = "sentinel-triage"
-version = "0.1.0"
+version = "0.2.0"
 description = "AI-powered log anomaly detection and incident triage pipeline"
 requires-python = ">=3.11"
 license = { text = "MIT" }
@@ -24,6 +24,8 @@ dependencies = [
     "openai>=1.0,<2",
     "python-multipart>=0.0.9",
     "structlog>=24.0,<25",
+    "prometheus-client>=0.20,<1",
+    "anthropic>=2.0,<3",
 ]
 
 [project.optional-dependencies]
@@ -36,6 +38,7 @@ dev = [
     "mypy>=1.11,<2",
     "pre-commit>=3,<4",
     "fakeredis>=2.26,<3",
+    "pgserver>=0.1.4,<1",  # embedded Postgres + pgvector for local tests without Docker
 ]
 lstm = [
     "torch>=2.3,<3",
@@ -46,7 +49,7 @@ requires = ["setuptools>=70", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools.packages.find]
-include = ["app*"]
+include = ["app*", "agent*"]
 
 [tool.ruff]
 target-version = "py311"
@@ -54,6 +57,10 @@ line-length = 100
 
 [tool.ruff.lint]
 select = ["E", "F", "I", "N", "W", "UP", "B", "SIM"]
+
+[tool.ruff.lint.per-file-ignores]
+# Reproduction scripts print wide tables
+"audit/*" = ["E501"]
 
 [tool.ruff.lint.flake8-bugbear]
 # FastAPI's dependency-injection markers are meant to be used as defaults
@@ -73,6 +80,11 @@ concurrency = ["greenlet", "thread"]
 # python_version is left to the running interpreter (CI runs 3.11)
 strict = true
 plugins = ["pydantic.mypy"]
+
+[[tool.mypy.overrides]]
+# The demo route imports the synthetic generator, an untyped script
+module = "scripts.*"
+ignore_errors = true
 
 [[tool.mypy.overrides]]
 # Celery ships without type hints, so its task decorator is untyped
