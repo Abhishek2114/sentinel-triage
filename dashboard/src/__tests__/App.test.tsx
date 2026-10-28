@@ -152,6 +152,11 @@ describe("App", () => {
     });
     expect(await screen.findByText("user-service")).toBeTruthy();
     expect(screen.getByText("New incident #2 on user-service: DB connection failure")).toBeTruthy();
+    // And a toast in the corner that opens it
+    const toast = screen.getByText("New incident #2").closest(".toast") as HTMLElement;
+    expect(within(toast).getByText("user-service · DB connection failure")).toBeTruthy();
+    fireEvent.click(within(toast).getByText("Open incident"));
+    await waitFor(() => expect(window.location.hash).toBe("#/incidents/2"));
   });
 
   it("renders the triage and resolves with a note for incident memory", async () => {
@@ -187,6 +192,16 @@ describe("App", () => {
     expect((await screen.findByText(/shows/)).textContent).toContain("synthetic");
     fireEvent.click(await screen.findByRole("button", { name: "Run demo" }));
     expect(await screen.findByText("Synthetic cpu spike injected.")).toBeTruthy();
+    const progress = screen.getByRole("list", { name: "Demo progress" });
+    expect(within(progress).getByText(/Detect \+ triage/).textContent).toContain("active");
+    expect(within(progress).getByText("1,200 lines · 0 services")).toBeTruthy();
+
+    // The pipeline completes when the demo's incident arrives over the WebSocket
+    FakeSocket.instances[0].open();
+    FakeSocket.instances[0].push({ type: "incident.created", incident: incident({ id: 7, service: "demo-order-service" }) });
+    expect(await within(progress).findByText("#7 opened")).toBeTruthy();
+    expect(within(progress).getByText(/^Incident/).textContent).toContain("done");
+    expect(screen.getByText("Incident #7 raised.")).toBeTruthy();
   });
 
   it("hides write actions without a key when writes need one", async () => {

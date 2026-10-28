@@ -6,6 +6,7 @@ import { Incidents } from "./components/Incidents";
 import { Logs } from "./components/Logs";
 import { Onboarding } from "./components/Onboarding";
 import { Overview } from "./components/Overview";
+import { Toasts } from "./components/Toasts";
 import { runbookTitle } from "./format";
 import { useLiveIncidents } from "./useLiveIncidents";
 
@@ -162,7 +163,7 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
   const level = overview?.verdict.level;
 
   return (
-    <div className="app">
+    <div className="app" data-level={level ?? "no_data"}>
       <a className="skip" href="#main">
         Skip to content
       </a>
@@ -182,7 +183,7 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
                 >
                   {v.label}
                   {v.view === "incidents" && openCount > 0 && (
-                    <span className="count alert" aria-label={`${openCount} open`}>
+                    <span key={openCount} className="count alert" aria-label={`${openCount} open`}>
                       {openCount}
                     </span>
                   )}
@@ -214,6 +215,7 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
       )}
 
       <main id="main" tabIndex={-1}>
+        <div key={route.view} className="view">
         {route.view === "overview" && (
           <Overview
             data={overview}
@@ -223,6 +225,7 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
             onOpenIncident={(id) => go({ view: "incidents", incident: id })}
             onShowLogs={(service) => go({ view: "logs", service })}
             onDemoStarted={() => setTimeout(refreshOverview, 4000)}
+            lastEvent={live.lastEvent}
           />
         )}
         {route.view === "incidents" && (
@@ -255,7 +258,10 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
         {route.view === "ship" && (
           <Onboarding origin={window.location.origin} writeRequiresKey={config?.write_requires_key ?? true} />
         )}
+        </div>
       </main>
+
+      <Toasts event={live.lastEvent} onOpen={(id) => go({ view: "incidents", incident: id })} />
 
       <div className="visually-hidden" role="status" aria-live="polite">
         {announcement}

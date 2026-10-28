@@ -1061,3 +1061,608 @@ pre code {
     transition: background-color 0.12s;
   }
 }
+
+/* ── Depth and motion ────────────────────────────
+   Static polish first (glass top bar, ambient glow, pipeline, toasts); every
+   animation sits in the reduced-motion guard at the end, so the console stays
+   still for anyone who asked their OS for less motion. */
+
+.app {
+  position: relative;
+  isolation: isolate;
+}
+/* Ambient glow behind the page; turns red while an incident is open */
+.app::before {
+  content: "";
+  position: fixed;
+  inset: -20vh -10vw auto;
+  height: 70vh;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(40% 50% at 20% 30%, color-mix(in srgb, var(--accent) 16%, transparent), transparent 70%),
+    radial-gradient(35% 45% at 80% 20%, color-mix(in srgb, var(--green) 12%, transparent), transparent 70%);
+  filter: blur(20px);
+  opacity: 0.9;
+  transition: opacity 0.6s;
+}
+.app[data-level="incident"]::before {
+  background:
+    radial-gradient(40% 50% at 25% 25%, color-mix(in srgb, var(--red) 18%, transparent), transparent 70%),
+    radial-gradient(35% 45% at 80% 15%, color-mix(in srgb, var(--amber) 12%, transparent), transparent 70%);
+}
+
+.topbar {
+  background: color-mix(in srgb, var(--surface) 78%, transparent);
+  backdrop-filter: saturate(1.4) blur(12px);
+  -webkit-backdrop-filter: saturate(1.4) blur(12px);
+}
+.pulse,
+.conn-live span {
+  position: relative;
+}
+.pulse::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: inherit;
+}
+
+.card {
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s;
+}
+.card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px -12px rgb(0 0 0 / 0.35);
+}
+.state-incident {
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--red) 35%, transparent);
+}
+
+.button {
+  position: relative;
+  overflow: hidden;
+  transition:
+    background-color 0.12s,
+    transform 0.12s,
+    box-shadow 0.2s;
+}
+.button:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.button.primary:hover:not(:disabled) {
+  box-shadow: 0 6px 18px -8px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.button.primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(105deg, transparent 35%, rgb(255 255 255 / 0.28) 50%, transparent 65%);
+  transform: translateX(-120%);
+  pointer-events: none;
+}
+
+.verdict {
+  position: relative;
+  overflow: hidden;
+}
+.verdict-icon {
+  position: relative;
+}
+
+/* Skeleton while the overview loads */
+.skeleton {
+  display: grid;
+  gap: 12px;
+}
+.skeleton .bone {
+  border-radius: var(--radius);
+  background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%) 0 0 / 300% 100%;
+  border: 1px solid var(--border);
+}
+.skeleton .bone-verdict {
+  height: 96px;
+}
+.skeleton .bone-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 12px;
+}
+.skeleton .bone-card {
+  height: 150px;
+}
+
+/* Evidence: lift as a bar */
+.lift {
+  display: inline-flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+  width: 100%;
+}
+.lift-bar {
+  display: inline-block;
+  height: 6px;
+  min-width: 2px;
+  max-width: 90px;
+  border-radius: 3px;
+  background: linear-gradient(90deg, color-mix(in srgb, var(--accent) 45%, transparent), var(--accent));
+  transform-origin: left;
+}
+
+/* ── Demo pipeline ── */
+.pipeline-track {
+  position: relative;
+  margin-top: 14px;
+}
+.pipeline {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  position: relative;
+}
+.pipeline-track::before,
+.pipeline-fill {
+  content: "";
+  position: absolute;
+  top: 15px;
+  left: 12.5%;
+  right: 12.5%;
+  height: 2px;
+  background: var(--border);
+}
+.pipeline-fill {
+  background: linear-gradient(90deg, var(--accent), var(--green));
+  transform-origin: left;
+  transform: scaleX(var(--progress, 0));
+  transition: transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.stage {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+.stage-node {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: var(--surface);
+  border: 2px solid var(--border);
+  font-weight: 700;
+  position: relative;
+  z-index: 1;
+  transition:
+    background-color 0.3s,
+    border-color 0.3s,
+    color 0.3s;
+}
+.stage-active .stage-node {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+.stage-active .stage-node::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--accent);
+  border-right-color: var(--accent);
+}
+.stage-done {
+  color: var(--text);
+}
+.stage-done .stage-node {
+  background: var(--green);
+  border-color: var(--green);
+  color: #fff;
+}
+.stage-text {
+  display: flex;
+  flex-direction: column;
+}
+.stage-label {
+  font-weight: 600;
+}
+.stage-sub {
+  font-size: 0.78rem;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+}
+.pipeline-foot {
+  margin: 12px 0 0;
+  font-variant-numeric: tabular-nums;
+}
+.demo-body {
+  flex: 1;
+  min-width: 0;
+}
+
+/* ── Toasts ── */
+.toasts {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  width: min(360px, calc(100vw - 32px));
+  pointer-events: none;
+}
+.toast {
+  pointer-events: auto;
+  position: relative;
+  overflow: hidden;
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 10px;
+  align-items: start;
+  padding: 12px 12px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 16px 40px -16px rgb(0 0 0 / 0.45);
+}
+.toast-created {
+  border-left-color: var(--red);
+}
+.toast-resolved {
+  border-left-color: var(--green);
+}
+.toast-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  font-weight: 800;
+  font-size: 0.85rem;
+  color: #fff;
+  background: var(--accent);
+}
+.toast-created .toast-icon {
+  background: var(--red);
+}
+.toast-resolved .toast-icon {
+  background: var(--green);
+}
+.toast-title {
+  font-weight: 650;
+  margin: 0;
+}
+.toast-body {
+  margin: 2px 0 6px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  overflow-wrap: anywhere;
+}
+.toast-timer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: currentColor;
+  color: var(--accent);
+  opacity: 0.6;
+  transform-origin: left;
+}
+.toast-created .toast-timer {
+  color: var(--red);
+}
+.toast-resolved .toast-timer {
+  color: var(--green);
+}
+
+@media (max-width: 860px) {
+  .pipeline {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  .pipeline-track::before,
+  .pipeline-fill {
+    display: none;
+  }
+  .stage {
+    flex-direction: row;
+    text-align: left;
+    gap: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .app::before {
+    animation: drift 18s ease-in-out infinite alternate;
+  }
+  @keyframes drift {
+    to {
+      transform: translate3d(4vw, 3vh, 0) scale(1.08);
+    }
+  }
+
+  /* Live and incident beacons: a ring that keeps expanding outward */
+  .pulse-incident::after,
+  .pulse-ok::after,
+  .pulse-warning::after {
+    animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  }
+  .pulse-incident::after {
+    animation-duration: 1.2s;
+  }
+  .conn-live span {
+    display: inline-block;
+    animation: breathe 2.4s ease-in-out infinite;
+  }
+  @keyframes ping {
+    75%,
+    100% {
+      transform: scale(2.6);
+      opacity: 0;
+    }
+  }
+  @keyframes breathe {
+    50% {
+      opacity: 0.35;
+    }
+  }
+
+  /* Views and panels rise in */
+  .view {
+    animation: rise 0.35s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .verdict {
+    animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .board > .card {
+    animation: rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 45ms + 80ms);
+  }
+  .incident > * {
+    animation: rise 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .incident > :nth-child(2) {
+    animation-delay: 60ms;
+  }
+  .incident > :nth-child(3) {
+    animation-delay: 120ms;
+  }
+  .incident > :nth-child(4) {
+    animation-delay: 180ms;
+  }
+  .incident > :nth-child(n + 5) {
+    animation-delay: 240ms;
+  }
+  @keyframes rise {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+  }
+
+  /* An open incident: the banner breathes, and light sweeps across it */
+  .verdict-incident {
+    animation:
+      rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      alarm 2.8s ease-in-out 0.5s infinite;
+  }
+  .verdict-incident::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(100deg, transparent 30%, color-mix(in srgb, var(--red) 14%, transparent) 50%, transparent 70%);
+    transform: translateX(-100%);
+    animation: sweep 3.6s ease-in-out infinite;
+    pointer-events: none;
+  }
+  .verdict-incident .verdict-icon::after,
+  .verdict-warning .verdict-icon::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    border: 2px solid currentColor;
+    color: var(--red);
+    animation: ring 1.8s ease-out infinite;
+  }
+  .verdict-warning .verdict-icon::after {
+    color: var(--amber);
+  }
+  .verdict-ok .verdict-icon {
+    animation: pop 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.2s both;
+  }
+  @keyframes alarm {
+    50% {
+      box-shadow: 0 0 0 6px color-mix(in srgb, var(--red) 12%, transparent);
+    }
+  }
+  @keyframes sweep {
+    60%,
+    100% {
+      transform: translateX(100%);
+    }
+  }
+  @keyframes ring {
+    from {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    to {
+      transform: scale(1.7);
+      opacity: 0;
+    }
+  }
+  @keyframes pop {
+    from {
+      transform: scale(0.4);
+      opacity: 0;
+    }
+  }
+
+  .board > .card.state-incident {
+    animation:
+      rise 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      glow 2.4s ease-in-out 0.6s infinite;
+  }
+  @keyframes glow {
+    50% {
+      box-shadow:
+        0 0 0 1px color-mix(in srgb, var(--red) 45%, transparent),
+        0 0 22px -4px color-mix(in srgb, var(--red) 45%, transparent);
+    }
+  }
+
+  /* Sparkline bars grow from the baseline, left to right */
+  .spark rect {
+    transform-box: fill-box;
+    transform-origin: bottom;
+    animation: grow 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+    animation-delay: calc(var(--i, 0) * 9ms + 150ms);
+  }
+  @keyframes grow {
+    from {
+      transform: scaleY(0);
+    }
+  }
+
+  .lift-bar {
+    animation: grow-x 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) 0.25s both;
+  }
+  @keyframes grow-x {
+    from {
+      transform: scaleX(0);
+    }
+  }
+
+  .dot-open {
+    animation: blink 1.6s ease-in-out infinite;
+  }
+  @keyframes blink {
+    50% {
+      box-shadow: 0 0 0 4px color-mix(in srgb, var(--red) 25%, transparent);
+    }
+  }
+  .incident-row.arrived {
+    background: linear-gradient(90deg, color-mix(in srgb, var(--red) 16%, transparent), transparent 80%);
+    transition: background 2s ease-out;
+  }
+
+  .count.alert {
+    animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+
+  .button.primary:hover:not(:disabled)::after {
+    transform: translateX(120%);
+    transition: transform 0.7s ease;
+  }
+
+  .skeleton .bone {
+    animation: shimmer 1.4s linear infinite;
+  }
+  @keyframes shimmer {
+    to {
+      background-position: -300% 0;
+    }
+  }
+
+  .dialog[open] {
+    animation: dialog-in 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  .dialog[open]::backdrop {
+    animation: fade 0.22s ease both;
+    backdrop-filter: blur(3px);
+  }
+  @keyframes dialog-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.97);
+    }
+  }
+  @keyframes fade {
+    from {
+      opacity: 0;
+    }
+  }
+
+  .stage-active .stage-node::before {
+    animation: spin 0.9s linear infinite;
+  }
+  .stage-done .stage-node {
+    animation: pop 0.45s cubic-bezier(0.3, 1.6, 0.5, 1) both;
+  }
+  @keyframes spin {
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
+  .toast {
+    animation: toast-in 0.45s cubic-bezier(0.2, 0.9, 0.25, 1.15) both;
+  }
+  .toast.leaving {
+    animation: toast-out 0.3s ease-in both;
+  }
+  .toast-timer {
+    animation: countdown var(--toast-ms, 7000ms) linear both;
+  }
+  .toast:hover .toast-timer {
+    animation-play-state: paused;
+  }
+  .toast-created .toast-icon {
+    animation: ring-soft 1.6s ease-out 0.3s 2;
+  }
+  @keyframes toast-in {
+    from {
+      opacity: 0;
+      transform: translateX(110%) scale(0.96);
+    }
+  }
+  @keyframes toast-out {
+    to {
+      opacity: 0;
+      transform: translateX(40%);
+    }
+  }
+  @keyframes countdown {
+    to {
+      transform: scaleX(0);
+    }
+  }
+  @keyframes ring-soft {
+    from {
+      box-shadow: 0 0 0 0 color-mix(in srgb, var(--red) 55%, transparent);
+    }
+    to {
+      box-shadow: 0 0 0 12px transparent;
+    }
+  }
+}
+
+/* Hover and press feedback move things too; keep it still when asked */
+@media (prefers-reduced-motion: reduce) {
+  .card:hover,
+  .button:active:not(:disabled) {
+    transform: none;
+  }
+  .card,
+  .button,
+  .pipeline-fill {
+    transition: none;
+  }
+}

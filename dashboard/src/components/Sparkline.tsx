@@ -26,7 +26,7 @@ export function Sparkline({ errors, events, label }: Props) {
         const h = (n / max) * 22;
         const e = (Math.min(errors[i] ?? 0, n) / max) * 22;
         return (
-          <g key={i}>
+          <g key={i} style={{ "--i": i } as React.CSSProperties}>
             <rect x={i * 4} y={24 - h} width={3} height={h} className="spark-events" />
             {e > 0 && <rect x={i * 4} y={24 - e} width={3} height={e} className="spark-errors" />}
           </g>

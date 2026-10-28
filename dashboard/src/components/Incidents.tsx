@@ -3,6 +3,7 @@ import { type KeyboardEvent, useEffect, useMemo, useRef, useState } from "react"
 import { ApiError, api, type Incident, type IncidentDetail as Detail } from "../api";
 import { formatAgo, formatDateTime, formatDuration, formatTime, plural, runbookTitle } from "../format";
 import { filterIncidents, type StatusFilter } from "../incidents";
+import { useFlip } from "../motion";
 import { Dialog } from "./Dialog";
 import { Markdown } from "./Markdown";
 
@@ -23,6 +24,7 @@ export function Incidents(props: Props) {
   const [status, setStatus] = useState<StatusFilter>("open");
   const [text, setText] = useState("");
   const listRef = useRef<HTMLUListElement>(null);
+  // Re-sorted rows glide to their new place; arrivals slide in and glow
 
   const visible = useMemo(() => {
     const needle = text.trim().toLowerCase();
@@ -46,6 +48,7 @@ export function Incidents(props: Props) {
       if (prev) onSelect(prev.id);
     }
   };
+  useFlip(listRef, [visible.map((i) => `${i.id}:${i.updated_at}`).join()]);
   useEffect(() => {
     listRef.current?.querySelector<HTMLElement>('[aria-selected="true"]')?.focus({ preventScroll: false });
   }, [selectedId]);
@@ -103,6 +106,7 @@ export function Incidents(props: Props) {
             {visible.map((i) => (
               <li
                 key={i.id}
+                data-flip={i.id}
                 role="option"
                 aria-selected={i.id === selectedId}
                 tabIndex={i.id === selectedId || (selectedId === null && i === visible[0]) ? 0 : -1}
@@ -203,6 +207,8 @@ function IncidentDetail({
   };
 
   const steps = detail.next_steps ?? [];
+  // Log scale: one ×40 pattern shouldn't flatten every other bar
+  const maxLift = Math.max(...(detail.evidence ?? []).map((e) => Math.log1p(e.lift)), 1e-9);
   const method =
     detail.triage_method === "llm"
       ? `Written by ${detail.llm_model ?? "an LLM"} from the evidence below; claims checked against it`
@@ -322,7 +328,16 @@ function IncidentDetail({
                     <td className="num">{e.count}</td>
                     <td className="num">{e.baseline_count}</td>
                     <td className="num">{e.errors}</td>
-                    <td className="num">×{e.lift.toFixed(1)}</td>
+                    <td className="num">
+                      <span className="lift">
+                        <span
+                          className="lift-bar"
+                          aria-hidden="true"
+                          style={{ width: `${(Math.log1p(e.lift) / maxLift) * 90}px` }}
+                        />
+                        ×{e.lift.toFixed(1)}
+                      </span>
+                    </td>
                   </tr>
                 ))}
               </tbody>
