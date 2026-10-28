@@ -208,10 +208,20 @@ _DOCS_CSP = (
 _STATIC_HEADERS = [
     (b"x-content-type-options", b"nosniff"),
     (b"referrer-policy", b"no-referrer"),
-    (b"x-frame-options", b"DENY"),
     (b"cross-origin-opener-policy", b"same-origin"),
     (b"permissions-policy", b"camera=(), microphone=(), geolocation=()"),
 ]
+
+
+def framing_headers(settings: Settings, csp: str) -> list[tuple[bytes, bytes]]:
+    """Who may show this page in a frame. Nobody by default; FRAME_ANCESTORS
+    names exact origins (a Hugging Face Space page embeds its app). Only CSP
+    can name origins, so X-Frame-Options is left out when any are allowed."""
+    if not settings.frame_ancestors:
+        return [(b"content-security-policy", csp.encode()), (b"x-frame-options", b"DENY")]
+    allowed = " ".join(settings.frame_ancestors)
+    csp = csp.replace("frame-ancestors 'none'", f"frame-ancestors 'self' {allowed}")
+    return [(b"content-security-policy", csp.encode())]
 
 
 class SecurityHeadersMiddleware:
@@ -229,7 +239,7 @@ class SecurityHeadersMiddleware:
             if message["type"] == "http.response.start":
                 headers = list(message.get("headers", []))
                 present = {k.lower() for k, _ in headers}
-                extra = [(b"content-security-policy", csp.encode()), *_STATIC_HEADERS]
+                extra = [*framing_headers(get_settings(), csp), *_STATIC_HEADERS]
                 headers += [(k, v) for k, v in extra if k not in present]
                 message["headers"] = headers
             await send(message)

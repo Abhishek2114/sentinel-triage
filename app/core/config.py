@@ -1,9 +1,46 @@
 """Application configuration via pydantic-settings."""
 
+import re
 from functools import lru_cache
 from typing import Literal
+from urllib.parse import parse_qsl, urlencode, urlsplit, urlunsplit
 
+from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# libpq's sslmode values, which asyncpg takes as its ``ssl`` argument
+_SSLMODES = {"disable", "allow", "prefer", "require", "verify-ca", "verify-full"}
+
+
+def asyncpg_url(url: str) -> str:
+    """Accept a plain Postgres URL as hosted providers (Neon, Supabase) hand
+    them out, and turn it into one SQLAlchemy's asyncpg driver understands.
+
+    ``postgres://`` and ``postgresql://`` become ``postgresql+asyncpg://``;
+    ``sslmode=require`` becomes ``ssl=require``; ``channel_binding`` (which
+    asyncpg doesn't take) is dropped.
+    """
+    parts = urlsplit(url)
+    scheme = parts.scheme
+    if scheme in ("postgres", "postgresql"):
+        scheme = "postgresql+asyncpg"
+    if scheme != "postgresql+asyncpg":
+        return url
+    query = []
+    for key, value in parse_qsl(parts.query, keep_blank_values=True):
+        if key == "sslmode" and value in _SSLMODES:
+            query.append(("ssl", value))
+        elif key != "channel_binding":
+            query.append((key, value))
+    return urlunsplit(parts._replace(scheme=scheme, query=urlencode(query)))
+
+
+def celery_redis_url(url: str) -> str:
+    """Celery refuses a TLS Redis URL (``rediss://``, as Upstash gives out)
+    unless it says how to check the certificate; default to checking it."""
+    if url.startswith("rediss://") and "ssl_cert_reqs=" not in url:
+        return url + ("&" if "?" in url else "?") + "ssl_cert_reqs=CERT_REQUIRED"
+    return url
 
 
 class Settings(BaseSettings):
@@ -50,6 +87,25 @@ class Settings(BaseSettings):
     # the retrieval ablation's dev splits selected (README "Retrieval")
     retrieval_mode: Literal["auto", "dense", "bm25", "char", "hybrid", "hybrid_dense"] = "auto"
 
+    @field_validator("database_url")
+    @classmethod
+    def _asyncpg_url(cls, v: str) -> str:
+        return asyncpg_url(v)
+
+    @field_validator("celery_broker_url", "celery_result_backend")
+    @classmethod
+    def _celery_redis_url(cls, v: str) -> str:
+        return celery_redis_url(v)
+
+    @field_validator("frame_ancestors")
+    @classmethod
+    def _origins_only(cls, v: list[str]) -> list[str]:
+        # These go verbatim into the CSP header, so nothing but plain origins
+        for origin in v:
+            if not re.fullmatch(r"https://[A-Za-z0-9.-]+(:\d{1,5})?", origin):
+                raise ValueError(f"FRAME_ANCESTORS takes https origins only, got {origin!r}")
+        return v
+
     # ── App ───────────────────────────────────────────
     log_level: str = "INFO"
     api_v1_prefix: str = "/api/v1"
@@ -85,6 +141,11 @@ class Settings(BaseSettings):
     detection_interval_seconds: int = 300
     # Each run refits on this much history, so it must cover many normal windows
     detection_lookback_minutes: int = 360
+    # Run scheduled detection inside the API process instead of Celery beat,
+    # for single-container hosting. It only runs after new logs arrive, so an
+    # idle deployment never touches the database (serverless Postgres such as
+    # Neon can then suspend).
+    inprocess_scheduler: bool = False
     # Only these detectors' anomalies become incidents. Isolation Forest raises
     # ~34 false alarms a day (README results), so it isn't triaged by default.
     triage_detectors: list[str] = ["error_burst"]
@@ -100,6 +161,11 @@ class Settings(BaseSettings):
     # ── Live alerts ──────────────────────────────────
     # API processes relay incident events from Redis to WebSocket clients
     realtime_enabled: bool = True
+
+    # ── Embedding ────────────────────────────────────
+    # Origins allowed to show the dashboard in a frame, e.g.
+    # ["https://huggingface.co"] for a Hugging Face Space page. Empty: none.
+    frame_ancestors: list[str] = []
 
 
 @lru_cache

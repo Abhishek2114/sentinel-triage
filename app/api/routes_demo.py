@@ -21,20 +21,18 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_embedder_dep, get_redis_factory
 from app.core.config import get_settings
-from app.core.db import async_session_factory, get_session
+from app.core.db import get_session
 from app.core.logging import get_logger
 from app.core.security import require_key
-from app.detect.pipeline import run_detection
 from app.ingest.pipeline import prepare_lines
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
 from app.rag.embeddings import Embedder
 from app.rag.index import count_chunks, index_runbooks
-from app.rag.summarizer import llm_from_settings
-from app.realtime import RedisFactory, publish_incident
+from app.realtime import RedisFactory
+from app.scheduler import detect_and_triage
 from app.schemas import DemoRunResponse
-from app.triage.service import triage
 
 router = APIRouter(tags=["demo"])
 log = get_logger(__name__)
@@ -60,22 +58,15 @@ async def _clear_demo_data(session: AsyncSession) -> None:
 async def _detect_and_triage(
     since: datetime, until: datetime, embedder: Embedder, redis: RedisFactory
 ) -> None:
-    settings = get_settings()
     try:
-        async with async_session_factory() as session:
-            summary = await run_detection(
-                session, detectors=["error_burst"], since=since, until=until
-            )
-            for anomaly_id in summary.new_ids_by_detector.get("error_burst", []):
-                outcome = await triage(
-                    session,
-                    anomaly_id,
-                    embedder=embedder,
-                    llm=llm_from_settings(settings, async_session_factory),
-                    group_gap=timedelta(minutes=settings.incident_group_minutes),
-                )
-                if outcome.event is not None:
-                    await publish_incident(session, redis, outcome.incident_id, outcome.event)
+        await detect_and_triage(
+            since,
+            until,
+            embedder=embedder,
+            redis=redis,
+            detectors=["error_burst"],
+            triage_detectors=["error_burst"],
+        )
     except Exception:  # background task: log, never crash the server
         log.exception("demo_run_failed")
 

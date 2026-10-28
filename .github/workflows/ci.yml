@@ -126,6 +126,37 @@ jobs:
           curl -ks $B/api/v1/incidents | grep -q '"service":"demo-'  # the demo produced an incident
           docker compose -f deploy/docker-compose.prod.yml ps
 
+      # The free Hugging Face deploy: one container, cloned from this very commit
+      - name: Build the Hugging Face Space image
+        run: docker build -f deploy/huggingface/Dockerfile --build-arg REF=${{ github.sha }} -t sentinel-space deploy/huggingface
+
+      - name: Smoke-test the Space image
+        run: |
+          docker network create space
+          docker run -d --name space-db --network space -e POSTGRES_PASSWORD=ci -e POSTGRES_DB=sentinel pgvector/pgvector:pg16
+          docker run -d --name space-redis --network space redis:7-alpine
+          # TCP only answers once the image's init scripts are done
+          for i in $(seq 1 60); do docker exec space-db psql -U postgres -h localhost -d sentinel -c 'select 1' >/dev/null 2>&1 && break; sleep 1; done
+          # A plain postgres:// URL with sslmode, the form Neon hands out
+          docker run -d --name space --network space -p 7860:7860 \
+            -e DATABASE_URL='postgres://postgres:ci@space-db:5432/sentinel?sslmode=disable' \
+            -e REDIS_URL=redis://space-redis:6379/0 \
+            -e API_KEYS='["ci-test-key"]' \
+            sentinel-space
+          B=http://localhost:7860
+          code() { curl -s -o /dev/null -w '%{http_code}' "$@"; }
+          curl -sf --retry 30 --retry-delay 2 --retry-all-errors $B/api/v1/health | grep -q '"db":"connected"'
+          test "$(code $B/)" = 200
+          # The Space page may frame the app; nobody else may
+          curl -sI $B/ | grep -i '^content-security-policy' | grep -q "frame-ancestors 'self' https://huggingface.co"
+          ! curl -sI $B/ | grep -qi '^x-frame-options'
+          test "$(code -X POST $B/api/v1/detect -H 'Content-Type: application/json' -d '{}')" = 401
+          test "$(code -X POST $B/api/v1/demo/run)" = 202
+          for i in $(seq 1 30); do curl -s $B/api/v1/incidents | grep -q '"service":"demo-' && break; sleep 2; done
+          curl -s $B/api/v1/incidents | grep -q '"service":"demo-'
+
       - name: Show logs on failure
         if: failure()
-        run: docker compose -f deploy/docker-compose.prod.yml logs --tail 200
+        run: |
+          docker compose -f deploy/docker-compose.prod.yml logs --tail 200
+          docker logs space --tail 200 || true

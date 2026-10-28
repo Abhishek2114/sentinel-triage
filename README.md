@@ -224,6 +224,10 @@ docker compose -f deploy/docker-compose.prod.yml up -d --build
 [docs/DEPLOY.md](docs/DEPLOY.md) walks through it step by step: server, DNS, firewall, secrets,
 checks, updates and backups.
 
+**Free option:** one container on a Hugging Face Space, with Neon Postgres and Upstash Redis. No
+card and no domain needed; it sleeps when idle. [docs/DEPLOY_FREE.md](docs/DEPLOY_FREE.md) has the
+steps.
+
 ## API (v1)
 
 | Method | Path | Purpose |
@@ -264,8 +268,8 @@ scripts/      synthetic log generator, run_eval.py
 eval/results  committed evaluation report (heldout.json)
 data/runbooks Markdown runbooks used for retrieval
 migrations/   Alembic schema migrations
-deploy/       production Compose file, Caddyfile, env template
-docs/         design document, VPS deploy guide
+deploy/       production Compose file, Caddyfile, env template, Hugging Face Space files
+docs/         design document, VPS and free deploy guides
 ```
 
 ## Development

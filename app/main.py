@@ -60,13 +60,21 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, None]:
 
         relay_task = asyncio.create_task(relay(redis_factory(settings.redis_url), broadcast))
 
+    # Single-container hosting: detection runs here instead of Celery beat
+    scheduler_task: asyncio.Task[None] | None = None
+    if settings.inprocess_scheduler:
+        from app.scheduler import run_scheduler
+
+        scheduler_task = asyncio.create_task(run_scheduler(redis_factory(settings.redis_url)))
+
     yield
 
     warmup.cancel()
-    if relay_task is not None:
-        relay_task.cancel()
-        with contextlib.suppress(asyncio.CancelledError):
-            await relay_task
+    for task in (relay_task, scheduler_task):
+        if task is not None:
+            task.cancel()
+            with contextlib.suppress(asyncio.CancelledError):
+                await task
     await engine.dispose()
     log.info("shutdown_complete")
 

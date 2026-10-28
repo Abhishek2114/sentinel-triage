@@ -16,6 +16,7 @@ from app.core.security import require_key
 from app.ingest.pipeline import prepare_lines
 from app.ingest.reader import read_file_lines
 from app.models.event import LogEvent
+from app.scheduler import note_ingest
 from app.schemas import IngestRequest, IngestResponse
 
 router = APIRouter(tags=["ingest"])
@@ -75,6 +76,8 @@ async def ingest_logs(
 
     # Commit before responding, so "ingested" is only reported once it is durable
     await session.commit()
+    if ingested:
+        note_ingest()  # the in-process scheduler (if on) scans on its next tick
 
     log.info("ingest_complete", ingested=ingested, errors=errors, **dict(prepared.stats))
     return IngestResponse(ingested=ingested, errors=errors)
