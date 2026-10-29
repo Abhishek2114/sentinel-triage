@@ -14,7 +14,14 @@
 > then have an LLM explain each anomaly using the actual log lines and the team's runbooks. Every
 > detector is scored against labelled faults, so quality is measured, not assumed.
 
-<!-- TODO (Phase 7): add a dashboard screenshot or GIF here. It's the first thing a reviewer looks at. -->
+![Dashboard overview: one open incident on demo-payment-service, with per-service event and error bars](docs/images/dashboard-overview.png)
+
+<details>
+<summary><b>The incident view:</b> what happened, the likely cause, the runbook steps, and the log patterns that changed</summary>
+
+![Incident #5: CPU spike on demo-payment-service, with a rule-based triage report and evidence table](docs/images/dashboard-incident.png)
+
+</details>
 
 ---
 
@@ -64,7 +71,7 @@ flowchart LR
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
 | 6. Second model | LSTM autoencoder, evaluated against error-burst and Isolation Forest on the same held-out runs | ✅ |
-| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide; hosted demo and screenshots to come | 🟡 |
+| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide, free Hugging Face Space setup, dashboard screenshots; hosted demo link to come | 🟡 |
 
 ## Results
 
