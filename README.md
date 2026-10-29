@@ -38,7 +38,7 @@ flowchart LR
    *new* templates never seen before (the signature of a bad deploy).
 4. **Detect.** Pluggable detectors behind one interface (`fit / score / detect`, higher score = more
    anomalous), fitted per service: a statistical **error-burst** baseline, **Isolation Forest**, and
-   (next) an **LSTM autoencoder**. Consecutive flagged minutes merge into one anomaly, and re-runs
+   an **LSTM autoencoder** that scores 10-minute sequences. Consecutive flagged minutes merge into one anomaly, and re-runs
    update rows instead of duplicating them. Runs on demand (`POST /detect`) or every 5 minutes (Celery beat).
 5. **Triage.** Rank the anomaly's log patterns by how much more often they appear than in the hour
    before, use the top ones to retrieve the right runbook (pgvector), then have an LLM write a
@@ -63,7 +63,7 @@ flowchart LR
 | 3. Eval | Reproducible `run_eval.py`: precision, recall, F1, MTTD, false alarms/day, per-fault-type recall | ✅ |
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
-| 6. Second model | LSTM autoencoder vs. Isolation Forest comparison | 🔲 |
+| 6. Second model | LSTM autoencoder, evaluated against error-burst and Isolation Forest on the same held-out runs | ✅ |
 | 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide; hosted demo and screenshots to come | 🟡 |
 
 ## Results
@@ -75,23 +75,28 @@ These seeds were never used to tune any detector setting.
 |---|---|---|---|---|---|
 | Error-burst baseline (`error_burst`) | **0.97** | 0.85 | **0.91** | 4.1 min | **0.5** |
 | Isolation Forest (`iforest`) | 0.38 | 0.86 | 0.52 | 3.4 min | 33.7 |
-| LSTM autoencoder | Phase 6 | | | | |
+| LSTM autoencoder (`lstm_ae`) | 0.54 | 0.70 | 0.61 | 5.3 min | 9.9 |
 
-| Recall by fault type | `error_burst` | `iforest` |
-|---|---|---|
-| Bad deploy | 46/49 | 45/49 |
-| CPU spike | 37/43 | 35/43 |
-| DB connection failure | 50/51 | 51/51 |
-| Memory leak | 38/57 | 42/57 |
+| Recall by fault type | `error_burst` | `iforest` | `lstm_ae` |
+|---|---|---|---|
+| Bad deploy | 46/49 | 45/49 | 39/49 |
+| CPU spike | 37/43 | 35/43 | 27/43 |
+| DB connection failure | 50/51 | 51/51 | 47/51 |
+| Memory leak | 38/57 | 42/57 | 28/57 |
 
 **What this shows**
-- **The simple baseline wins.** Both detectors catch about 85% of faults, but Isolation Forest also
-  raises ~34 false alarms a day against error-burst's 0.5. At this log volume (~4 lines per service
-  per minute) one stray error looks unusual to a generic outlier model. Paging someone 34 times a day
+- **The simple baseline wins.** Error-burst and Isolation Forest both catch about 85% of faults, but
+  Isolation Forest also raises ~34 false alarms a day against error-burst's 0.5. At this log volume
+  (~4 lines per service per minute) one stray error looks unusual to a generic outlier model. Paging someone 34 times a day
   is not an option, so any ML detector now has to beat `error_burst`, not just exist.
   ([DESIGN.md §4.9](docs/DESIGN.md))
-- **Memory leaks are the weak spot** (two-thirds caught). A leak builds up slowly rather than producing
-  a burst of errors, which is the case the Phase 6 sequence model is meant to cover.
+- **The LSTM autoencoder beats Isolation Forest but not the baseline.** Scoring 10-minute sequences
+  instead of single minutes cuts false alarms from ~34 to ~10 a day, at the cost of lower recall
+  (0.70) and slower alerts. It is still 20 times noisier than `error_burst`, so it isn't triaged or
+  scheduled by default. ([DESIGN.md §4.12](docs/DESIGN.md))
+- **Memory leaks are the weak spot** for every detector. In this generator a leak is the faintest
+  fault (30% of the service's lines, against 40–60% for the others), not a slow build-up, so a
+  sequence model has no extra pattern to find; it misses more of them than the baseline does.
 - **MTTD is detector latency**: when the first alert could fire, measured from the fault start. The
   5-minute Celery schedule adds up to 5 minutes on top in production.
 
@@ -122,8 +127,10 @@ window. An anomaly that overlaps no fault is a false alarm, including one on the
 Counts are pooled across runs before computing the ratios. The detection and triage code is exactly
 what the API runs (`detect_events`, `build_evidence`, the same retrieval ranking).
 
-Reproduce it (about 1 minute; the output matches
-[`eval/results/heldout.json`](eval/results/heldout.json) byte for byte):
+Reproduce it (about 8 minutes, most of it training the LSTM once per service and run; for a
+1-minute check of the other two, add `--detectors error_burst iforest --output /tmp/check.json`).
+The output matches
+[`eval/results/heldout.json`](eval/results/heldout.json) byte for byte:
 
 ```bash
 python scripts/run_eval.py

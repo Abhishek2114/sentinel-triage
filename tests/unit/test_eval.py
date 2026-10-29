@@ -148,7 +148,7 @@ class TestRunEvalCli:
 
         result = json.loads(out.read_text())
         assert result["source"]["generator"]["seeds"] == [11]
-        assert [d["detector"] for d in result["detectors"]] == ["error_burst", "iforest"]
+        assert [d["detector"] for d in result["detectors"]] == ["error_burst", "iforest", "lstm_ae"]
         assert "| `error_burst` |" in capsys.readouterr().out
 
     def test_scores_existing_files(self, tmp_path, monkeypatch):

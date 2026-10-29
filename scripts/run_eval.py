@@ -12,7 +12,7 @@ unchanged code reproduces it byte for byte, so `git diff` shows exactly how a
 change moved the numbers.
 
 Usage:
-    python scripts/run_eval.py                       # held-out seeds 1000-1049 (~1 min)
+    python scripts/run_eval.py                       # held-out seeds 1000-1049 (~8 min)
     python scripts/run_eval.py --seeds 1000-1004     # quick check
     python scripts/run_eval.py --logs data/synthetic/events.log \\
         --labels data/synthetic/labels.jsonl         # score one existing run
@@ -34,7 +34,7 @@ from typing import Any
 # Allow `python scripts/run_eval.py` from the repo root without installing scripts/
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from app.detect.pipeline import DEFAULT_DETECTORS, DETECTORS  # noqa: E402
+from app.detect.pipeline import DETECTORS  # noqa: E402
 from app.eval.harness import RunbookIndex, evaluate_run  # noqa: E402
 from app.eval.metrics import DetectorReport, IncidentReport, RetrievalReport  # noqa: E402
 from app.rag.embeddings import HASHING, get_embedder  # noqa: E402
@@ -137,7 +137,7 @@ def main() -> None:
         "--detectors",
         nargs="+",
         choices=sorted(DETECTORS),
-        default=list(DEFAULT_DETECTORS),
+        default=list(DETECTORS),
     )
     parser.add_argument("--window-minutes", type=int, default=1)
     parser.add_argument(

@@ -1,7 +1,7 @@
 """Pydantic request/response schemas."""
 
 from datetime import datetime
-from typing import Literal, get_args
+from typing import Literal
 
 from pydantic import BaseModel, Field
 
@@ -47,7 +47,9 @@ class AnomalyRead(BaseModel):
     model_config = {"from_attributes": True}
 
 
-DetectorName = Literal["error_burst", "iforest"]
+DetectorName = Literal["error_burst", "iforest", "lstm_ae"]
+# lstm_ae trains a network per service, so it runs only when named
+_DEFAULT_DETECTORS: tuple[DetectorName, ...] = ("error_burst", "iforest")
 
 
 class DetectRequest(BaseModel):
@@ -58,7 +60,7 @@ class DetectRequest(BaseModel):
     until: datetime | None = Field(None, description="Exclusive upper bound (default: all)")
     window_minutes: int = Field(1, ge=1, le=60)
     detectors: list[DetectorName] = Field(
-        default_factory=lambda: list(get_args(DetectorName)), min_length=1
+        default_factory=lambda: list(_DEFAULT_DETECTORS), min_length=1
     )
 
 

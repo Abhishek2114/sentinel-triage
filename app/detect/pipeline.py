@@ -23,6 +23,7 @@ from app.detect.base import AnomalyResult, Detector
 from app.detect.error_burst import ErrorBurstDetector
 from app.detect.features import EventLike, EventPoint, WindowFeatures, aggregate_windows
 from app.detect.iforest import IForestDetector
+from app.detect.lstm_ae import LSTMAutoencoder
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 
@@ -32,8 +33,11 @@ log = get_logger(__name__)
 DETECTORS: dict[str, Callable[[], Detector]] = {
     ErrorBurstDetector.name: ErrorBurstDetector,
     IForestDetector.name: IForestDetector,
+    LSTMAutoencoder.name: LSTMAutoencoder,
 }
-DEFAULT_DETECTORS: tuple[str, ...] = tuple(DETECTORS)
+# What runs when no detector is named. The LSTM autoencoder trains a network per
+# service (~1.6 s each), so it runs only when asked for, e.g. by run_eval.py
+DEFAULT_DETECTORS: tuple[str, ...] = (ErrorBurstDetector.name, IForestDetector.name)
 
 # Default cap on services scored per run (Settings.max_services_per_detection)
 MAX_SERVICES = 200

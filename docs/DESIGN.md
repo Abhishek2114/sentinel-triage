@@ -28,7 +28,7 @@ answers all four, and measures how well it does it.**
 | Type | Requirement | How it's met |
 |---|---|---|
 | Functional | Ingest logs in ISO, syslog and JSON formats | `app/ingest/parser.py` |
-| Functional | Detect anomalous time windows per service | Template features + error-burst baseline / Isolation Forest (`app/detect/`) |
+| Functional | Detect anomalous time windows per service | Template features + error-burst baseline / Isolation Forest / LSTM autoencoder (`app/detect/`) |
 | Functional | Explain each anomaly with evidence and a runbook | Lift-ranked evidence + pgvector runbook retrieval + optional LLM (`app/triage/`, `app/rag/`) |
 | Functional | Push incidents to a live dashboard | Redis pub/sub → WebSocket (`app/realtime.py`, `app/api/ws.py`), React UI (`dashboard/`) |
 | Quality | **Measurable** detection quality | Labelled synthetic faults → precision, recall, MTTD (`scripts/run_eval.py`) |
@@ -286,7 +286,7 @@ errors (e.g. a new log pattern). The LSTM autoencoder has to beat
 **Trade-off:** `error_burst` only sees errors. A failure that shows up as
 silence, as new non-error messages, or as a slow build-up (the memory-leak
 misses above) is invisible to it. That is the gap the sequence model in
-Phase 6 is meant to close.
+Phase 6 was meant to close; §4.12 has how it did.
 
 ### 4.10 One anomaly per incident, written idempotently
 - **Merge:** consecutive flagged minutes (allowing one quiet minute) become a
@@ -333,6 +333,65 @@ later anomalies widen the span but don't rewrite the summary. Two unrelated
 faults on one service within 15 minutes would be merged (0 of 200 here, since
 the generator spaces faults about an hour apart). Real traffic could need a
 shorter window, or grouping by root-cause pattern as well as time.
+
+### 4.12 The LSTM autoencoder: better than Isolation Forest, not the baseline
+**What it is** (`app/detect/lstm_ae.py`): for each service, an LSTM encoder
+squeezes the last 10 minutes of window features into a 4-number summary and an
+LSTM decoder unrolls it back. A window's score is how badly the sequence
+ending there is reconstructed. Counts go through `log1p` and are standardised
+per service; the alarm threshold is median + 7 × MAD of the service's own
+scores, like `error_burst`'s per-service baseline.
+
+**What it took to make it work** (development seeds 1–20 only; the held-out
+seeds were run once, at the end):
+- **Trimmed training was the big step.** The model fits on the same windows it
+  scores, faults included, and at first it learned to reconstruct the faults:
+  recall 0.33 at 8.4 false alarms a day. Training once, dropping the
+  worst-reconstructed 10% of sequences and training again raised that to 0.54
+  at the same false-alarm rate (0.64 at the threshold finally chosen). This is the same idea as `error_burst` trimming its noisiest windows
+  before learning "normal".
+- **What didn't help:** dropping `error_rate` (the noisiest feature at 4 lines
+  a minute) and feeding 5-minute sums instead of minutes both made it worse.
+  Longer sequences, a different bottleneck size and more epochs moved F1 by a
+  few hundredths either way, so the simpler settings stayed.
+- **Threshold** chosen by best F1 on the development seeds: z = 7.
+
+**Held-out result** (50 runs, 200 faults, same harness as §4.9):
+
+| Detector | Precision | Recall | F1 | MTTD | False alarms / day |
+|---|---|---|---|---|---|
+| `error_burst` | 0.97 | 0.85 | 0.91 | 4.1 min | 0.5 |
+| `iforest` | 0.38 | 0.86 | 0.52 | 3.4 min | 33.7 |
+| `lstm_ae` | 0.54 | 0.70 | 0.61 | 5.3 min | 9.9 |
+
+The development seeds gave F1 0.57 and 10.2 false alarms a day, so the
+settings weren't fitted to noise.
+
+**Why it lands between the two.** Looking at a sequence dilutes a single odd
+minute, which is exactly Isolation Forest's failure, so false alarms drop
+by more than two thirds. But the reconstruction error counts every feature,
+and at ~4 lines a minute most of what it sees is noise in event counts and
+error rates. `error_burst` sums the one feature that carries the signal. The
+LSTM also alerts later, because a fault has to fill several minutes of the
+sequence before the error rises.
+
+**Memory leaks: the hypothesis didn't hold.** The plan said a sequence model
+would catch the slow build-up `error_burst` misses. It caught fewer (28/57 vs
+38/57). The reason is in the data: the generator's leak isn't a slow build-up
+but the faintest fault (30% of the service's lines vs 40–60% for the others),
+so there is no extra pattern for a sequence model to find. Testing that
+hypothesis properly needs a generator whose leak ramps up over time.
+
+**Decision:** keep `lstm_ae` as an opt-in detector (`POST /detect` with
+`"detectors": ["lstm_ae"]`, or `SCHEDULED_DETECTORS`). It isn't run or triaged
+by default: ~10 false alarms a day is still 20 times the baseline, and it
+trains a network per service (~1.6 s each on one CPU thread). Training runs on
+one thread, so the scores don't depend on how many cores the machine has; a
+different CPU or torch build can still shift the last digits.
+
+**Trade-off:** torch becomes a runtime dependency of detection. It was already
+installed for sentence-transformers, and it's imported only when this detector
+runs.
 
 ## 5. Data model
 
@@ -437,5 +496,5 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 | 3 ✅ | `run_eval.py` produces precision / recall / MTTD | **Proves it works** before adding complexity |
 | 4 ✅ | Evidence + runbook RAG + optional LLM triage, runbook choice measured | The "wow" feature, now measurable |
 | 5 ✅ | Dashboard, Redis-backed live alerts, incident grouping | Makes it demoable; one fault = one incident |
-| 6 | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
+| 6 ✅ | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
 | 7 | Hosted demo + screenshots | What a reviewer sees first |

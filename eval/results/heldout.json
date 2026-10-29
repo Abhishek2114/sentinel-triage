@@ -125,6 +125,38 @@
           "total": 57
         }
       }
+    },
+    {
+      "detector": "lstm_ae",
+      "precision": 0.539,
+      "recall": 0.705,
+      "f1": 0.6109,
+      "mttd_seconds": 317.4,
+      "median_ttd_seconds": 300.0,
+      "false_alarms_per_day": 9.92,
+      "anomalies": 269,
+      "true_positives": 145,
+      "faults": 200,
+      "detected": 141,
+      "hours": 299.85,
+      "recall_by_fault_type": {
+        "bad_deploy": {
+          "detected": 39,
+          "total": 49
+        },
+        "cpu_spike": {
+          "detected": 27,
+          "total": 43
+        },
+        "db_connection_failure": {
+          "detected": 47,
+          "total": 51
+        },
+        "memory_leak": {
+          "detected": 28,
+          "total": 57
+        }
+      }
     }
   ],
   "triage": {
@@ -218,6 +250,38 @@
           "false_alarms_per_day": 24.03,
           "anomalies": 13,
           "true_positives": 7,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6,
+          "recall": 0.75,
+          "f1": 0.6667,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 8.01,
+          "anomalies": 5,
+          "true_positives": 3,
           "faults": 4,
           "detected": 3,
           "hours": 5.99,
@@ -349,6 +413,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6,
+          "recall": 0.75,
+          "f1": 0.6667,
+          "mttd_seconds": 220.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 5,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -434,6 +530,34 @@
           "false_alarms_per_day": 32.01,
           "anomalies": 13,
           "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5714,
+          "recall": 1.0,
+          "f1": 0.7273,
+          "mttd_seconds": 390.0,
+          "median_ttd_seconds": 450.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 7,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -561,6 +685,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5714,
+          "recall": 1.0,
+          "f1": 0.7273,
+          "mttd_seconds": 420.0,
+          "median_ttd_seconds": 450.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 7,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -646,6 +802,34 @@
           "false_alarms_per_day": 16.01,
           "anomalies": 11,
           "true_positives": 7,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 1.0,
+          "f1": 0.6667,
+          "mttd_seconds": 315.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 16.01,
+          "anomalies": 8,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -765,6 +949,34 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "mttd_seconds": 440.0,
+          "median_ttd_seconds": 480.0,
+          "false_alarms_per_day": 20.01,
+          "anomalies": 8,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -867,6 +1079,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 380.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 12.01,
+          "anomalies": 6,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -952,6 +1192,34 @@
           "false_alarms_per_day": 28.01,
           "anomalies": 12,
           "true_positives": 5,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 160.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
           "faults": 4,
           "detected": 3,
           "hours": 6.0,
@@ -1079,6 +1347,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 8.01,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -1181,6 +1481,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.3333,
+          "recall": 0.5,
+          "f1": 0.4,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 16.01,
+          "anomalies": 6,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -1268,6 +1596,30 @@
             },
             "memory_leak": {
               "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
               "total": 2
             }
           }
@@ -1377,6 +1729,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 200.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 6,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -1483,6 +1867,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.625,
+          "recall": 1.0,
+          "f1": 0.7692,
+          "mttd_seconds": 225.0,
+          "median_ttd_seconds": 120.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 8,
+          "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -1567,6 +1979,34 @@
           "median_ttd_seconds": 300.0,
           "false_alarms_per_day": 48.01,
           "anomalies": 16,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 260.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 16.0,
+          "anomalies": 8,
           "true_positives": 4,
           "faults": 4,
           "detected": 3,
@@ -1691,6 +2131,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6667,
+          "recall": 0.5,
+          "f1": 0.5714,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 3,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -1790,6 +2262,34 @@
             },
             "memory_leak": {
               "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.4,
+          "recall": 0.5,
+          "f1": 0.4444,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 5,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
               "total": 1
             }
           }
@@ -1895,6 +2395,34 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.375,
+          "recall": 0.5,
+          "f1": 0.4286,
+          "mttd_seconds": 150.0,
+          "median_ttd_seconds": 150.0,
+          "false_alarms_per_day": 20.01,
+          "anomalies": 8,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -1975,6 +2503,30 @@
           "median_ttd_seconds": 120.0,
           "false_alarms_per_day": 36.01,
           "anomalies": 11,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 4,
           "true_positives": 2,
           "faults": 4,
           "detected": 2,
@@ -2074,6 +2626,38 @@
           "false_alarms_per_day": 32.02,
           "anomalies": 14,
           "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.625,
+          "recall": 1.0,
+          "f1": 0.7692,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 12.01,
+          "anomalies": 8,
+          "true_positives": 5,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -2209,6 +2793,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 400.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -2304,6 +2920,34 @@
             },
             "db_connection_failure": {
               "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6667,
+          "recall": 0.5,
+          "f1": 0.5714,
+          "mttd_seconds": 360.0,
+          "median_ttd_seconds": 360.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 3,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
               "total": 2
             },
             "memory_leak": {
@@ -2421,6 +3065,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 1.0,
+          "recall": 1.0,
+          "f1": 1.0,
+          "mttd_seconds": 525.0,
+          "median_ttd_seconds": 600.0,
+          "false_alarms_per_day": 0.0,
+          "anomalies": 4,
+          "true_positives": 4,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -2509,6 +3185,34 @@
           "median_ttd_seconds": 180.0,
           "false_alarms_per_day": 48.02,
           "anomalies": 15,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 6,
           "true_positives": 3,
           "faults": 4,
           "detected": 3,
@@ -2629,6 +3333,34 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 12.01,
+          "anomalies": 6,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -2714,6 +3446,34 @@
           "false_alarms_per_day": 24.01,
           "anomalies": 12,
           "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.8889,
+          "mttd_seconds": 345.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -2841,6 +3601,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.25,
+          "f1": 0.3333,
+          "mttd_seconds": 480.0,
+          "median_ttd_seconds": 480.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 2,
+          "true_positives": 1,
+          "faults": 4,
+          "detected": 1,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -2936,6 +3728,34 @@
           "recall_by_fault_type": {
             "bad_deploy": {
               "detected": 2,
+              "total": 2
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 6,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
               "total": 2
             },
             "cpu_spike": {
@@ -3049,6 +3869,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 360.0,
+          "median_ttd_seconds": 360.0,
+          "false_alarms_per_day": 8.01,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3144,6 +3992,34 @@
             },
             "memory_leak": {
               "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 330.0,
+          "median_ttd_seconds": 330.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
               "total": 2
             }
           }
@@ -3257,6 +4133,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.4286,
+          "recall": 0.75,
+          "f1": 0.5455,
+          "mttd_seconds": 500.0,
+          "median_ttd_seconds": 480.0,
+          "false_alarms_per_day": 16.01,
+          "anomalies": 7,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3346,6 +4254,34 @@
           "false_alarms_per_day": 36.04,
           "anomalies": 17,
           "true_positives": 8,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.8889,
+          "mttd_seconds": 420.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 5.99,
@@ -3473,6 +4409,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 360.0,
+          "median_ttd_seconds": 360.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3587,6 +4555,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3674,6 +4674,34 @@
           "recall_by_fault_type": {
             "bad_deploy": {
               "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6667,
+          "recall": 0.5,
+          "f1": 0.5714,
+          "mttd_seconds": 210.0,
+          "median_ttd_seconds": 210.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 3,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
               "total": 1
             },
             "db_connection_failure": {
@@ -3795,6 +4823,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.2,
+          "recall": 0.25,
+          "f1": 0.2222,
+          "mttd_seconds": 240.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 16.0,
+          "anomalies": 5,
+          "true_positives": 1,
+          "faults": 4,
+          "detected": 1,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3897,6 +4957,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6667,
+          "recall": 0.5,
+          "f1": 0.5714,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 3,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -3982,6 +5070,38 @@
           "false_alarms_per_day": 40.01,
           "anomalies": 15,
           "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6667,
+          "recall": 1.0,
+          "f1": 0.8,
+          "mttd_seconds": 330.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 6,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -4105,6 +5225,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "mttd_seconds": 320.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 20.01,
+          "anomalies": 8,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -4211,6 +5359,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.5,
+          "f1": 0.5,
+          "mttd_seconds": 270.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 8.01,
+          "anomalies": 4,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 0,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -4310,6 +5490,34 @@
             },
             "db_connection_failure": {
               "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.25,
+          "recall": 0.25,
+          "f1": 0.25,
+          "mttd_seconds": 180.0,
+          "median_ttd_seconds": 180.0,
+          "false_alarms_per_day": 12.01,
+          "anomalies": 4,
+          "true_positives": 1,
+          "faults": 4,
+          "detected": 1,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
               "total": 2
             }
           }
@@ -4423,6 +5631,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6,
+          "recall": 0.75,
+          "f1": 0.6667,
+          "mttd_seconds": 340.0,
+          "median_ttd_seconds": 420.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 5,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 0,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -4521,6 +5761,30 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.3333,
+          "recall": 0.5,
+          "f1": 0.4,
+          "mttd_seconds": 480.0,
+          "median_ttd_seconds": 480.0,
+          "false_alarms_per_day": 16.01,
+          "anomalies": 6,
+          "true_positives": 2,
+          "faults": 4,
+          "detected": 2,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -4606,6 +5870,38 @@
           "false_alarms_per_day": 32.02,
           "anomalies": 14,
           "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.4444,
+          "recall": 1.0,
+          "f1": 0.6154,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 20.01,
+          "anomalies": 9,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -4729,6 +6025,34 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.75,
+          "recall": 0.75,
+          "f1": 0.75,
+          "mttd_seconds": 360.0,
+          "median_ttd_seconds": 360.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 4,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -4824,6 +6148,34 @@
             },
             "memory_leak": {
               "detected": 2,
+              "total": 2
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6,
+          "recall": 0.75,
+          "f1": 0.6667,
+          "mttd_seconds": 260.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 5,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
               "total": 2
             }
           }
@@ -4937,6 +6289,38 @@
               "total": 1
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.375,
+          "recall": 0.75,
+          "f1": 0.5,
+          "mttd_seconds": 360.0,
+          "median_ttd_seconds": 240.0,
+          "false_alarms_per_day": 20.02,
+          "anomalies": 8,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
         }
       ],
       "incidents": [
@@ -5035,6 +6419,30 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.5,
+          "recall": 0.75,
+          "f1": 0.6,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 12.0,
+          "anomalies": 6,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "cpu_spike": {
+              "detected": 1,
+              "total": 2
+            },
+            "memory_leak": {
+              "detected": 2,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -5116,6 +6524,34 @@
           "false_alarms_per_day": 28.02,
           "anomalies": 12,
           "true_positives": 5,
+          "faults": 4,
+          "detected": 4,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 2,
+              "total": 2
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.8889,
+          "mttd_seconds": 285.0,
+          "median_ttd_seconds": 270.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 6.0,
@@ -5235,6 +6671,34 @@
               "total": 2
             }
           }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.6,
+          "recall": 0.75,
+          "f1": 0.6667,
+          "mttd_seconds": 300.0,
+          "median_ttd_seconds": 300.0,
+          "false_alarms_per_day": 8.0,
+          "anomalies": 5,
+          "true_positives": 3,
+          "faults": 4,
+          "detected": 3,
+          "hours": 6.0,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 0,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 2,
+              "total": 2
+            }
+          }
         }
       ],
       "incidents": [
@@ -5320,6 +6784,38 @@
           "false_alarms_per_day": 24.02,
           "anomalies": 12,
           "true_positives": 6,
+          "faults": 4,
+          "detected": 4,
+          "hours": 5.99,
+          "recall_by_fault_type": {
+            "bad_deploy": {
+              "detected": 1,
+              "total": 1
+            },
+            "cpu_spike": {
+              "detected": 1,
+              "total": 1
+            },
+            "db_connection_failure": {
+              "detected": 1,
+              "total": 1
+            },
+            "memory_leak": {
+              "detected": 1,
+              "total": 1
+            }
+          }
+        },
+        {
+          "detector": "lstm_ae",
+          "precision": 0.8,
+          "recall": 1.0,
+          "f1": 0.8889,
+          "mttd_seconds": 510.0,
+          "median_ttd_seconds": 570.0,
+          "false_alarms_per_day": 4.0,
+          "anomalies": 5,
+          "true_positives": 4,
           "faults": 4,
           "detected": 4,
           "hours": 5.99,
