@@ -7,6 +7,10 @@ real logs would be. Incidents appear on the dashboard over the WebSocket.
 In DEMO_MODE anonymous visitors may run it; otherwise it needs an API key.
 It is globally rate limited (one run per DEMO_COOLDOWN_SECONDS across all
 processes) and replaces the previous demo data, so the database stays small.
+
+The baseline misses about one demo fault in ten (memory leaks most often),
+and a demo that ends in nothing shows nothing, so the button replays a run
+whose fault is caught. Misses are counted by the evaluation, not here.
 """
 
 from __future__ import annotations
@@ -14,6 +18,7 @@ from __future__ import annotations
 import asyncio
 import random
 from datetime import UTC, datetime, timedelta
+from typing import Any, cast
 
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from sqlalchemy import delete, func, insert, select, text, update
@@ -24,7 +29,9 @@ from app.core.config import get_settings
 from app.core.db import get_session
 from app.core.logging import get_logger
 from app.core.security import require_key
-from app.ingest.pipeline import prepare_lines
+from app.detect.features import EventPoint
+from app.detect.pipeline import detect_events
+from app.ingest.pipeline import PreparedBatch, prepare_lines
 from app.models.anomaly import Anomaly
 from app.models.event import LogEvent
 from app.models.incident import Incident
@@ -40,11 +47,42 @@ log = get_logger(__name__)
 PREFIX = "demo-"
 _LOCK_KEY = 0x5E7D0  # pg advisory lock id for "a demo run is starting"
 _tasks: set[asyncio.Task[None]] = set()
+# Runs to draw before settling for one whose fault the baseline misses
+_MAX_DRAWS = 5
 
 
 async def _allow(request: Request) -> None:
     if not get_settings().demo_mode:
         await require_key(request)
+
+
+def _synthetic_run(start: datetime) -> tuple[PreparedBatch, dict[str, Any]]:
+    """An hour of demo logs from ``start``, and its fault, which the baseline catches."""
+    from scripts.generate_logs import generate_logs
+
+    rng = random.SystemRandom()
+    for _ in range(_MAX_DRAWS):
+        lines, labels = generate_logs(
+            duration_hours=1,
+            fault_count=1,
+            seed=rng.randrange(1_000_000),
+            start_time=start,
+            service_prefix=PREFIX,
+        )
+        prepared, fault = prepare_lines(lines), labels[0]
+        points = [
+            EventPoint(
+                cast(datetime, r["timestamp"]),
+                str(r["service"]),
+                str(r["level"]),
+                cast(str | None, r["template_id"]),
+            )
+            for r in prepared.rows
+        ]
+        found = detect_events(points, ["error_burst"])
+        if any(a.service == fault["service"] for a in found.anomalies):
+            break
+    return prepared, fault
 
 
 async def _clear_demo_data(session: AsyncSession) -> None:
@@ -99,17 +137,8 @@ async def run_demo(
             headers={"Retry-After": str(max(wait, 1))},
         )
 
-    from scripts.generate_logs import generate_logs
-
     start = now.replace(second=0, microsecond=0) - timedelta(minutes=60)
-    lines, labels = generate_logs(
-        duration_hours=1,
-        fault_count=1,
-        seed=random.SystemRandom().randrange(1_000_000),
-        start_time=start,
-        service_prefix=PREFIX,
-    )
-    prepared = await asyncio.to_thread(prepare_lines, lines)
+    prepared, fault = await asyncio.to_thread(_synthetic_run, start)
     await _clear_demo_data(session)
     for i in range(0, len(prepared.rows), 1000):
         await session.execute(insert(LogEvent), prepared.rows[i : i + 1000])
@@ -122,7 +151,6 @@ async def run_demo(
     _tasks.add(task)  # keep a reference so it isn't garbage-collected mid-run
     task.add_done_callback(_tasks.discard)
 
-    fault = labels[0]
     log.info("demo_started", lines=len(prepared.rows), fault=fault["fault_type"])
     return DemoRunResponse(
         status="started",
