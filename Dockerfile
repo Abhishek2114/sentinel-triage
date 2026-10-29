@@ -41,16 +41,18 @@ COPY alembic.ini ./
 RUN useradd --create-home --uid 1000 app
 USER app
 
+# ── Celery worker ──────────────────────────────────────
+FROM base AS worker
+CMD ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=info", "--concurrency=4"]
+
 # ── API server (also serves the built dashboard) ───────
+# Last, so a build without a target (Render's) gets the API
 FROM base AS api
 COPY --from=dashboard /dashboard/dist ./dashboard/dist
 EXPOSE 8000
 # uvicorn reads its worker count from WEB_CONCURRENCY. Proxy headers are
 # trusted from anyone because only the reverse proxy can reach this port.
 ENV WEB_CONCURRENCY=2
-# Migrate once, then start the workers (each worker running create_all would race)
-CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port 8000 --proxy-headers --forwarded-allow-ips='*'"]
-
-# ── Celery worker ──────────────────────────────────────
-FROM base AS worker
-CMD ["celery", "-A", "app.workers.celery_app", "worker", "--loglevel=info", "--concurrency=4"]
+# Migrate once, then start the workers (each worker running create_all would race).
+# Hosts such as Render say which port to listen on in PORT.
+CMD ["sh", "-c", "alembic upgrade head && exec uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8000} --proxy-headers --forwarded-allow-ips='*'"]

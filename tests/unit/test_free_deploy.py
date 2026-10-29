@@ -1,4 +1,4 @@
-"""Settings and headers for the single-container (Hugging Face + Neon + Upstash) deploy."""
+"""Settings and headers for the single-container deploy (Render or HF Space + Neon + Upstash)."""
 
 import pytest
 from pydantic import ValidationError

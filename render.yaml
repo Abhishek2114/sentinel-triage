@@ -1,0 +1,41 @@
+# Render Blueprint: the free deploy, one container with Neon Postgres and
+# Upstash Redis. Walkthrough: docs/DEPLOY_FREE.md.
+#
+# Celery isn't used: the API runs detection itself after new logs arrive,
+# and the demo button runs detection and triage in the request.
+services:
+  - type: web
+    name: sentinel-triage
+    runtime: docker
+    plan: free
+    # Near Neon's and Upstash's AWS us-east-1; the database adds latency to every request
+    region: virginia
+    branch: main
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/v1/health
+    envVars:
+      # Secrets: Render asks for these when the Blueprint is created
+      - key: DATABASE_URL
+        sync: false
+      - key: REDIS_URL
+        sync: false
+      - key: API_KEYS
+        sync: false
+      # Defaults for a public demo
+      - key: ENVIRONMENT
+        value: production
+      - key: AUTO_CREATE_TABLES
+        value: "false"
+      - key: DEMO_MODE
+        value: "true"
+      - key: EMBEDDING_MODEL
+        value: hashing
+      - key: INPROCESS_SCHEDULER
+        value: "true"
+      - key: LLM_MAX_CALLS_PER_DAY
+        value: "100"
+      # One process: the free plan has 512 MB, and the in-process scheduler
+      # and the live alert relay each run once per process
+      - key: WEB_CONCURRENCY
+        value: "1"

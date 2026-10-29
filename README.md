@@ -71,7 +71,7 @@ flowchart LR
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
 | 6. Second model | LSTM autoencoder, evaluated against error-burst and Isolation Forest on the same held-out runs | ✅ |
-| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide, free Hugging Face Space setup, dashboard screenshots; hosted demo link to come | 🟡 |
+| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide, free Render setup, dashboard screenshots; hosted demo link to come | 🟡 |
 
 ## Results
 
@@ -238,9 +238,9 @@ docker compose -f deploy/docker-compose.prod.yml up -d --build
 [docs/DEPLOY.md](docs/DEPLOY.md) walks through it step by step: server, DNS, firewall, secrets,
 checks, updates and backups.
 
-**Free option:** one container on a Hugging Face Space, with Neon Postgres and Upstash Redis. No
-card and no domain needed; it sleeps when idle. [docs/DEPLOY_FREE.md](docs/DEPLOY_FREE.md) has the
-steps.
+**Free option:** one container on Render's free plan, with Neon Postgres and Upstash Redis. No
+domain needed; it sleeps when idle. [`render.yaml`](render.yaml) holds the setup and
+[docs/DEPLOY_FREE.md](docs/DEPLOY_FREE.md) has the steps.
 
 ## API (v1)
 
@@ -282,7 +282,8 @@ scripts/      synthetic log generator, run_eval.py
 eval/results  committed evaluation report (heldout.json)
 data/runbooks Markdown runbooks used for retrieval
 migrations/   Alembic schema migrations
-deploy/       production Compose file, Caddyfile, env template, Hugging Face Space files
+deploy/       production Compose file, Caddyfile, env template, Hugging Face Space files (paid)
+render.yaml   Render Blueprint for the free deploy
 docs/         design document, VPS and free deploy guides
 ```
 
