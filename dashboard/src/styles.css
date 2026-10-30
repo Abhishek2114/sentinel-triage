@@ -972,9 +972,42 @@ pre code {
 .shortcuts dd {
   margin: 0;
 }
-.keyform label {
+/* ── Admin sign-in ── */
+.signin .lead {
+  margin-top: 4px;
+}
+.signin label {
   display: block;
-  margin: 8px 0 4px;
+  margin: 14px 0 4px;
+  font-weight: 600;
+}
+.secret {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.secret input {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--mono);
+}
+.signin .fine,
+.signin .error {
+  margin: 6px 0 0;
+}
+.signin .button.primary {
+  margin-top: 16px;
+}
+.admin-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--green);
+  background: var(--green-bg);
 }
 .markdown ul,
 .markdown ol {

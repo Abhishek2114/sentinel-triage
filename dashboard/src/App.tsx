@@ -159,6 +159,12 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
     return () => window.removeEventListener("keydown", onKey);
   }, [go, route]);
 
+  const signOut = () => {
+    apiKey.set(null);
+    setHasKey(false);
+    setAnnouncement("Signed out");
+  };
+
   const canWrite = !config?.write_requires_key || hasKey;
   const openCount = live.incidents.filter((i) => i.status === "open").length;
   const services = overview?.services.map((s) => s.service).sort() ?? [];
@@ -216,9 +222,22 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
           <button type="button" className="icon-button" onClick={cycleTheme} aria-label={`Theme: ${theme}. Change theme`}>
             {theme === "dark" ? "☾" : theme === "light" ? "☀" : "◐"}
           </button>
-          <button type="button" className="button ghost small" onClick={() => setKeyOpen(true)}>
-            {hasKey ? "Key set" : "API key"}
-          </button>
+          {hasKey ? (
+            <>
+              <span className="admin-chip" title="Signed in as admin">
+                <span aria-hidden="true">●</span> Admin
+              </span>
+              <button type="button" className="button ghost small" onClick={signOut}>
+                Sign out
+              </button>
+            </>
+          ) : (
+            config?.write_requires_key !== false && (
+              <button type="button" className="button ghost small" onClick={() => setKeyOpen(true)}>
+                Admin sign-in
+              </button>
+            )
+          )}
           <button type="button" className="icon-button" onClick={() => setHelpOpen(true)} aria-label="Keyboard shortcuts">
             ?
           </button>
@@ -284,13 +303,14 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
         {announcement}
       </div>
 
-      <Dialog open={keyOpen} title="API key" onClose={() => setKeyOpen(false)}>
-        <KeyForm
-          hasKey={hasKey}
-          onSave={(key) => {
+      <Dialog open={keyOpen} title="Admin sign-in" onClose={() => setKeyOpen(false)}>
+        <SignInForm
+          refused={hasKey}
+          onSignedIn={(key) => {
             apiKey.set(key);
-            setHasKey(Boolean(key));
+            setHasKey(true);
             setKeyOpen(false);
+            setAnnouncement("Signed in as admin");
           }}
         />
       </Dialog>
@@ -318,39 +338,88 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
   );
 }
 
-function KeyForm({ hasKey, onSave }: { hasKey: boolean; onSave: (key: string | null) => void }) {
+/**
+ * The owner's sign-in. There are no accounts: visitors browse and run the demo
+ * without one, and the owner signs in with a key from the server's API_KEYS.
+ * The key is checked before it is kept, and lives only in this tab.
+ */
+function SignInForm({ refused, onSignedIn }: { refused: boolean; onSignedIn: (key: string) => void }) {
   const [value, setValue] = useState("");
+  const [shown, setShown] = useState(false);
+  const [checking, setChecking] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const submit = async () => {
+    const key = value.trim();
+    if (!key) {
+      setError("Enter your admin key.");
+      return;
+    }
+    setChecking(true);
+    setError(null);
+    try {
+      await api.authCheck(key);
+      onSignedIn(key);
+    } catch (e) {
+      setError(
+        e instanceof ApiError && e.status === 401
+          ? "That key isn't right. Check it was copied in full, without brackets or quotes."
+          : "Couldn't reach the server. Try again in a moment.",
+      );
+      setChecking(false);
+    }
+  };
+
   return (
     <form
-      className="keyform"
+      className="signin"
       onSubmit={(e) => {
         e.preventDefault();
-        onSave(value.trim() || null);
+        void submit();
       }}
     >
-      <p className="muted">
-        Kept in this tab's session storage and sent only in the <code>Authorization</code> header. Closing the tab
-        forgets it.
+      <p className="lead">
+        Only the site owner signs in, to resolve incidents and send real logs. Visitors can browse everything and run
+        the demo without an account.
       </p>
-      <label htmlFor="api-key">Key</label>
-      <input
-        id="api-key"
-        type="password"
-        autoComplete="off"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder={hasKey ? "•••••••• (set)" : "Paste an API key"}
-      />
-      <div className="row-gap">
-        <button type="submit" className="button primary">
-          Save
+      {refused && (
+        <p className="error" role="alert">
+          The saved key was refused. Sign in again.
+        </p>
+      )}
+      {/* Lets a password manager file the key under this site */}
+      <input type="text" name="username" value="admin" autoComplete="username" readOnly hidden />
+      <label htmlFor="admin-key">Admin key</label>
+      <div className="secret">
+        <input
+          id="admin-key"
+          name="password"
+          type={shown ? "text" : "password"}
+          autoComplete="current-password"
+          spellCheck={false}
+          autoFocus
+          value={value}
+          onChange={(e) => setValue(e.target.value)}
+          aria-invalid={error ? true : undefined}
+          aria-describedby={error ? "signin-error" : "signin-hint"}
+        />
+        <button type="button" className="button ghost small" aria-pressed={shown} onClick={() => setShown((s) => !s)}>
+          {shown ? "Hide" : "Show"}
         </button>
-        {hasKey && (
-          <button type="button" className="button ghost" onClick={() => onSave(null)}>
-            Forget key
-          </button>
-        )}
       </div>
+      {error ? (
+        <p id="signin-error" className="error" role="alert">
+          {error}
+        </p>
+      ) : (
+        <p id="signin-hint" className="fine">
+          The key set as <code>API_KEYS</code> on the server. It's kept in this browser tab only and forgotten when the
+          tab closes.
+        </p>
+      )}
+      <button type="submit" className="button primary" disabled={checking}>
+        {checking ? "Checking…" : "Sign in"}
+      </button>
     </form>
   );
 }

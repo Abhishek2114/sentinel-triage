@@ -185,6 +185,9 @@ function query(params: object): string {
 
 export const api = {
   config: () => request<PublicConfig>("/config"),
+  /** 200 if ``key`` may make changes, else an ApiError with status 401. */
+  authCheck: (key: string) =>
+    request<{ ok: boolean }>("/auth/check", { headers: { Authorization: `Bearer ${key}` } }),
   overview: (windowMinutes = 30) => request<Overview>(`/overview?window_minutes=${windowMinutes}`),
   incidents: () => request<Incident[]>("/incidents?limit=500"),
   incident: (id: number) => request<IncidentDetail>(`/incidents/${id}`),

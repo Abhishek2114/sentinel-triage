@@ -35,6 +35,14 @@ def keys(settings):
 
 
 class TestAuth:  # audit/repro_09
+    async def test_sign_in_check_accepts_only_a_valid_key(self, client, keys):
+        assert (await client.get("/api/v1/auth/check")).status_code == 401
+        wrong = {"Authorization": "Bearer nope"}
+        assert (await client.get("/api/v1/auth/check", headers=wrong)).status_code == 401
+        right = {"Authorization": f"Bearer {KEY}"}
+        r = await client.get("/api/v1/auth/check", headers=right)
+        assert r.status_code == 200 and r.json() == {"ok": True}
+
     async def test_writes_need_a_key(self, client, keys):
         assert (await client.post("/api/v1/ingest", json={"lines": [LINE]})).status_code == 401
         assert (await client.post("/api/v1/runbooks/index")).status_code == 401

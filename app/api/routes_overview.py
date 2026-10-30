@@ -11,7 +11,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.config import get_settings
 from app.core.db import get_session
-from app.core.security import auth_enabled, reads_are_public, require_read_access
+from app.core.security import auth_enabled, reads_are_public, require_key, require_read_access
 from app.models.event import LogEvent
 from app.models.incident import Incident
 from app.models.llm_usage import LLMUsage
@@ -203,3 +203,9 @@ async def public_config(session: AsyncSession = Depends(get_session)) -> PublicC
         llm_calls_today=calls or 0,
         llm_calls_limit=settings.llm_max_calls_per_day,
     )
+
+
+@router.get("/auth/check", dependencies=[Depends(require_key)])
+async def auth_check() -> dict[str, bool]:
+    """200 if the presented key may make changes, else 401: the dashboard's admin sign-in."""
+    return {"ok": True}

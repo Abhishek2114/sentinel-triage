@@ -398,7 +398,7 @@ function IncidentDetail({
           <p className="muted">
             {detail.resolution ? `Fix: ${detail.resolution}` : "Read-only view."}{" "}
             <button type="button" className="link" onClick={onNeedKey}>
-              Add an API key
+              Sign in as admin
             </button>{" "}
             to resolve incidents.
           </p>

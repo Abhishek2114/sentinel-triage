@@ -67,6 +67,10 @@ function mockApi() {
       calls.push({ url, init });
       const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status });
       if (url === "/api/v1/config") return json(config);
+      if (url === "/api/v1/auth/check") {
+        const auth = (init?.headers as Record<string, string> | undefined)?.Authorization;
+        return auth === "Bearer right-key" ? json({ ok: true }) : json({ detail: "Missing or invalid API key" }, 401);
+      }
       if (url.startsWith("/api/v1/overview")) return json(overview());
       if (url.startsWith("/api/v1/incidents?")) return json(server);
       if (url.startsWith("/api/v1/events")) return json([]);
@@ -210,6 +214,44 @@ describe("App", () => {
     renderApp();
     await screen.findByRole("heading", { name: /payment-service: CPU spike/ });
     expect(screen.queryByRole("button", { name: "Resolve incident" })).toBeNull();
-    expect(screen.getByRole("button", { name: "Add an API key" })).toBeTruthy();
+    expect(screen.getByRole("button", { name: "Sign in as admin" })).toBeTruthy();
+  });
+
+  it("signs the admin in only with a key the server accepts, and out again", async () => {
+    config.write_requires_key = true;
+    renderApp();
+    fireEvent.click(await screen.findByRole("button", { name: "Admin sign-in" }));
+    const field = screen.getByLabelText("Admin key") as HTMLInputElement;
+    expect(field.type).toBe("password");
+    fireEvent.click(screen.getByRole("button", { name: "Show" }));
+    expect(field.type).toBe("text");
+
+    fireEvent.change(field, { target: { value: "wrong-key" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect((await screen.findByRole("alert")).textContent).toMatch(/isn't right/);
+    expect(sessionStorage.getItem("sentinel.apiKey")).toBeNull();
+
+    fireEvent.change(field, { target: { value: "  right-key " } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Sign out" }));
+    expect(sessionStorage.getItem("sentinel.apiKey")).toBeNull();
+    expect(screen.getByRole("button", { name: "Admin sign-in" })).toBeTruthy();
+  });
+
+  it("keeps the key the server accepted", async () => {
+    config.write_requires_key = true;
+    renderApp();
+    fireEvent.click(await screen.findByRole("button", { name: "Admin sign-in" }));
+    fireEvent.change(screen.getByLabelText("Admin key"), { target: { value: "right-key" } });
+    fireEvent.click(screen.getByRole("button", { name: "Sign in" }));
+    expect(await screen.findByText("Admin")).toBeTruthy();
+    expect(sessionStorage.getItem("sentinel.apiKey")).toBe("right-key");
+  });
+
+  it("shows no sign-in when the server needs no key", async () => {
+    renderApp();
+    await screen.findByRole("heading", { level: 1, name: "1 open incident" });
+    await waitFor(() => expect(calls.some((c) => c.url === "/api/v1/config")).toBe(true));
+    expect(screen.queryByRole("button", { name: "Admin sign-in" })).toBeNull();
   });
 });
