@@ -5,6 +5,10 @@
 [![CI](https://github.com/Abhishek2114/sentinel-triage/actions/workflows/ci.yml/badge.svg)](https://github.com/Abhishek2114/sentinel-triage/actions/workflows/ci.yml)
 ![Python 3.11+](https://img.shields.io/badge/python-3.11%2B-blue)
 
+**Live demo: [sentinel-triage-tygt.onrender.com](https://sentinel-triage-tygt.onrender.com)**. Press
+**Run demo** to watch a synthetic fault get detected and triaged. It runs on a free plan, so the
+first visit after a quiet spell takes about a minute to wake up.
+
 > **The problem.** During an outage, on-call engineers scroll through thousands of log lines a
 > minute to work out whether something is really wrong, which service it is, and what caused it.
 > Threshold alerts are noisy and miss failures that change the *kind* of logs rather than the volume.
@@ -71,7 +75,7 @@ flowchart LR
 | 4. Triage | Lift-ranked evidence, pgvector runbook retrieval, grounded LLM report (optional), Celery + API | ✅ |
 | 5. Live UI | React dashboard, Redis pub/sub → WebSocket alerts, anomalies grouped into incidents | ✅ |
 | 6. Second model | LSTM autoencoder, evaluated against error-burst and Isolation Forest on the same held-out runs | ✅ |
-| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide, free Render setup, dashboard screenshots; hosted demo link to come | 🟡 |
+| 7. Deploy | One-server production stack (Compose + Caddy HTTPS, public demo mode), VPS guide, free Render setup, dashboard screenshots, [live demo](https://sentinel-triage-tygt.onrender.com) | ✅ |
 
 ## Results
 

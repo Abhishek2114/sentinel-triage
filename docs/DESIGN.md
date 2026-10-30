@@ -497,4 +497,4 @@ The order is deliberate: a thin **end-to-end slice with numbers** first, polish 
 | 4 ✅ | Evidence + runbook RAG + optional LLM triage, runbook choice measured | The "wow" feature, now measurable |
 | 5 ✅ | Dashboard, Redis-backed live alerts, incident grouping | Makes it demoable; one fault = one incident |
 | 6 ✅ | LSTM autoencoder vs. error-burst and Isolation Forest | The ML comparison story |
-| 7 | Hosted demo + screenshots | What a reviewer sees first |
+| 7 ✅ | Hosted demo + screenshots | What a reviewer sees first |
