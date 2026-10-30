@@ -1666,3 +1666,324 @@ pre code {
     transition: none;
   }
 }
+
+/* ── 3D ──────────────────────────────────────────
+   A perspective floor behind the page, surfaces with real depth, and cards
+   that lean toward the pointer (useTilt sets --rx/--ry and the glare's
+   --gx/--gy). The depth is static and stays for everyone; the movement is
+   in the reduced-motion guard below, and the tilt only runs for a mouse. */
+
+:root {
+  --shade: rgb(15 23 42 / 0.1);
+  --grid: color-mix(in srgb, var(--accent) 18%, transparent);
+  --glow: var(--accent);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --shade: rgb(0 0 0 / 0.5);
+    --grid: color-mix(in srgb, var(--accent) 26%, transparent);
+  }
+}
+:root[data-theme="dark"] {
+  --shade: rgb(0 0 0 / 0.5);
+  --grid: color-mix(in srgb, var(--accent) 26%, transparent);
+}
+.app[data-level="incident"] {
+  --grid: color-mix(in srgb, var(--red) 24%, transparent);
+  --glow: var(--red);
+}
+
+/* The room: a grid floor running to a glowing horizon, with a few orbs */
+.scene {
+  position: fixed;
+  inset: 0;
+  z-index: -2;
+  pointer-events: none;
+  overflow: hidden;
+  perspective: 600px;
+  perspective-origin: 50% 42%;
+}
+.scene-horizon {
+  position: absolute;
+  inset: calc(42% - 110px) -10% auto;
+  height: 220px;
+  background: radial-gradient(50% 50% at 50% 50%, color-mix(in srgb, var(--glow) 30%, transparent), transparent 72%);
+  filter: blur(10px);
+  transition: background 0.8s;
+}
+.scene-floor {
+  position: absolute;
+  inset: 42% -80% auto;
+  height: 160vh;
+  overflow: hidden;
+  transform-origin: 50% 0;
+  transform: translateX(calc(var(--px, 0) * -28px)) rotateX(74deg);
+  mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 40%, transparent 75%);
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 12%, #000 40%, transparent 75%);
+}
+.scene-floor::before {
+  content: "";
+  position: absolute;
+  inset: -40px 0 0;
+  background-image:
+    linear-gradient(to right, var(--grid) 1.5px, transparent 1.5px),
+    linear-gradient(to bottom, var(--grid) 1.5px, transparent 1.5px);
+  background-size: 40px 40px;
+}
+.scene-orb {
+  position: absolute;
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  opacity: 0.28;
+  background: radial-gradient(
+    circle at 34% 30%,
+    color-mix(in srgb, #fff 55%, var(--glow)),
+    color-mix(in srgb, var(--glow) 70%, transparent) 38%,
+    transparent 70%
+  );
+  transform: translate3d(calc(var(--px, 0) * var(--d) * 1px), calc(var(--py, 0) * var(--d) * 1px), 0);
+  transition:
+    transform 0.6s cubic-bezier(0.2, 0.8, 0.2, 1),
+    background 0.8s;
+}
+.scene-orb.small {
+  width: 56px;
+  height: 56px;
+  opacity: 0.35;
+}
+.scene-orb.tiny {
+  width: 22px;
+  height: 22px;
+  opacity: 0.5;
+}
+
+/* Surfaces sit above the floor: layered shadows and a lit top edge */
+.panel,
+.verdict,
+.card,
+.detail,
+.incident-list,
+.dialog {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.06),
+    0 1px 2px var(--shade),
+    0 12px 28px -14px var(--shade);
+}
+.panel,
+.card {
+  background: linear-gradient(180deg, color-mix(in srgb, var(--surface) 100%, #fff 3%), var(--surface));
+}
+
+/* Tilt: lean toward the pointer, lift on hover, glare follows the pointer */
+[data-tilt] {
+  --persp: 900px;
+  --lift: 0px;
+  position: relative;
+}
+/* :hover too, so the older flat hover lift on .card doesn't win */
+[data-tilt],
+[data-tilt]:hover {
+  transform: perspective(var(--persp)) translateY(var(--lift)) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+}
+[data-tilt] {
+  transition:
+    transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s ease,
+    border-color 0.2s;
+}
+[data-tilt="soft"] {
+  --persp: 2400px;
+}
+[data-tilt].tilting {
+  transition:
+    transform 0.1s linear,
+    box-shadow 0.3s ease,
+    border-color 0.2s;
+}
+.card[data-tilt] {
+  transform-style: preserve-3d;
+}
+/* The card's contents float a little above its face */
+.card[data-tilt] > * {
+  transform: translateZ(18px);
+}
+.card[data-tilt]::before,
+.demo[data-tilt]::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: radial-gradient(circle at var(--gx, 50%) var(--gy, 0%), rgb(255 255 255 / 0.22), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+.tilting::before {
+  opacity: 1;
+}
+
+/* The verdict light is a lit sphere */
+.verdict .verdict-icon {
+  background-image: radial-gradient(circle at 34% 28%, rgb(255 255 255 / 0.55), rgb(255 255 255 / 0) 46%);
+  box-shadow:
+    inset -4px -6px 10px rgb(0 0 0 / 0.22),
+    0 10px 18px -8px var(--shade);
+}
+
+/* Primary buttons are raised keys that press down */
+.button.primary {
+  box-shadow:
+    0 3px 0 color-mix(in srgb, var(--accent) 55%, #000),
+    0 10px 20px -10px color-mix(in srgb, var(--accent) 80%, transparent);
+}
+.button.primary:disabled {
+  box-shadow: none;
+}
+
+/* The logo: a small wireframe cube, red while an incident is open */
+.cube {
+  position: relative;
+  width: 16px;
+  height: 16px;
+  margin-right: 2px;
+  transform-style: preserve-3d;
+  transform: rotateX(-24deg) rotateY(38deg);
+}
+.cube i {
+  position: absolute;
+  inset: 0;
+  border: 1.5px solid var(--glow);
+  background: color-mix(in srgb, var(--glow) 14%, transparent);
+  border-radius: 2px;
+}
+.cube i:nth-child(1) {
+  transform: translateZ(8px);
+}
+.cube i:nth-child(2) {
+  transform: rotateY(180deg) translateZ(8px);
+}
+.cube i:nth-child(3) {
+  transform: rotateY(90deg) translateZ(8px);
+}
+.cube i:nth-child(4) {
+  transform: rotateY(-90deg) translateZ(8px);
+}
+.cube i:nth-child(5) {
+  transform: rotateX(90deg) translateZ(8px);
+}
+.cube i:nth-child(6) {
+  transform: rotateX(-90deg) translateZ(8px);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .scene-floor::before {
+    animation: floor-run 2.6s linear infinite;
+  }
+  .app[data-level="incident"] .scene-floor::before {
+    animation-duration: 1.3s;
+  }
+  @keyframes floor-run {
+    to {
+      transform: translateY(40px);
+    }
+  }
+  .scene-orb {
+    animation: hover-float 7s ease-in-out infinite alternate;
+  }
+  .scene-orb.small {
+    animation-duration: 5s;
+    animation-delay: -2s;
+  }
+  .scene-orb.tiny {
+    animation-duration: 4s;
+    animation-delay: -1s;
+  }
+  @keyframes hover-float {
+    to {
+      translate: 0 -18px;
+    }
+  }
+
+  .cube {
+    animation: cube-spin 10s linear infinite;
+  }
+  .app[data-level="incident"] .cube {
+    animation-duration: 3s;
+  }
+  @keyframes cube-spin {
+    from {
+      transform: rotateX(-24deg) rotateY(0deg);
+    }
+    to {
+      transform: rotateX(-24deg) rotateY(360deg);
+    }
+  }
+
+  [data-tilt]:hover {
+    --lift: -6px;
+  }
+  [data-tilt="soft"]:hover {
+    --lift: -2px;
+  }
+  .card[data-tilt]:hover {
+    box-shadow:
+      inset 0 1px 0 rgb(255 255 255 / 0.08),
+      0 2px 4px var(--shade),
+      0 28px 40px -18px var(--shade);
+  }
+
+  /* Cards swing up out of the floor, one after another */
+  .board > .card {
+    animation: swing-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+    animation-delay: calc(var(--i, 0) * 70ms + 100ms);
+  }
+  .board > .card.state-incident {
+    animation:
+      swing-in 0.7s cubic-bezier(0.2, 0.8, 0.2, 1) backwards,
+      glow 2.4s ease-in-out 0.8s infinite;
+    animation-delay: calc(var(--i, 0) * 70ms + 100ms), 0.8s;
+  }
+  .verdict {
+    animation: swing-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards;
+  }
+  .verdict-incident {
+    animation:
+      swing-in 0.6s cubic-bezier(0.2, 0.8, 0.2, 1) backwards,
+      alarm 2.8s ease-in-out 0.6s infinite;
+  }
+  @keyframes swing-in {
+    from {
+      opacity: 0;
+      transform: perspective(900px) translateY(28px) translateZ(-80px) rotateX(-32deg);
+    }
+  }
+
+  /* The sphere bobs; the "all clear" one pops in first */
+  .verdict .verdict-icon {
+    animation: bob 3.2s ease-in-out infinite;
+  }
+  .verdict-ok .verdict-icon {
+    animation:
+      pop 0.6s cubic-bezier(0.3, 1.6, 0.5, 1) 0.2s both,
+      bob 3.2s ease-in-out 0.8s infinite;
+  }
+  @keyframes bob {
+    50% {
+      translate: 0 -4px;
+    }
+  }
+
+  .button.primary:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow:
+      0 4px 0 color-mix(in srgb, var(--accent) 55%, #000),
+      0 16px 26px -10px color-mix(in srgb, var(--accent) 85%, transparent);
+  }
+  .button.primary:active:not(:disabled) {
+    transform: translateY(3px);
+    box-shadow:
+      0 0 0 color-mix(in srgb, var(--accent) 55%, #000),
+      0 4px 8px -4px color-mix(in srgb, var(--accent) 60%, transparent);
+  }
+}

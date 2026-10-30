@@ -101,3 +101,62 @@ export function useStopwatch(since: number | null, running: boolean): number {
   }, [since, running]);
   return since === null ? 0 : Math.max(0, (now - since) / 1000);
 }
+
+/**
+ * 3D tilt: elements marked ``data-tilt`` lean toward the pointer while a glare
+ * follows it (``data-tilt="soft"`` leans less, for wide panels), and the
+ * backdrop drifts a little against the pointer. One listener for the page,
+ * and only for a mouse or trackpad: on touch everything stays flat.
+ */
+export function useTilt(): void {
+  useEffect(() => {
+    if (!motionAllowed() || !window.matchMedia("(hover: hover) and (pointer: fine)").matches) return;
+    const root = document.documentElement;
+    let active: HTMLElement | null = null;
+    let last: PointerEvent | null = null;
+    let frame = 0;
+
+    const release = (el: HTMLElement) => {
+      el.classList.remove("tilting");
+      el.style.removeProperty("--rx");
+      el.style.removeProperty("--ry");
+    };
+    const apply = () => {
+      frame = 0;
+      if (!last) return;
+      const { clientX, clientY, target } = last;
+      root.style.setProperty("--px", ((clientX / window.innerWidth) * 2 - 1).toFixed(3));
+      root.style.setProperty("--py", ((clientY / window.innerHeight) * 2 - 1).toFixed(3));
+      const el = target instanceof Element ? target.closest<HTMLElement>("[data-tilt]") : null;
+      if (active && active !== el) release(active);
+      active = el;
+      if (!el) return;
+      const box = el.getBoundingClientRect();
+      const x = (clientX - box.left) / box.width;
+      const y = (clientY - box.top) / box.height;
+      const max = el.dataset.tilt === "soft" ? 2.5 : 9;
+      el.classList.add("tilting");
+      el.style.setProperty("--rx", `${((0.5 - y) * 2 * max).toFixed(2)}deg`);
+      el.style.setProperty("--ry", `${((x - 0.5) * 2 * max).toFixed(2)}deg`);
+      el.style.setProperty("--gx", `${(x * 100).toFixed(1)}%`);
+      el.style.setProperty("--gy", `${(y * 100).toFixed(1)}%`);
+    };
+    const onMove = (e: PointerEvent) => {
+      last = e;
+      if (!frame) frame = requestAnimationFrame(apply);
+    };
+    const onLeave = () => {
+      if (active) release(active);
+      active = null;
+    };
+
+    window.addEventListener("pointermove", onMove, { passive: true });
+    document.documentElement.addEventListener("pointerleave", onLeave);
+    return () => {
+      window.removeEventListener("pointermove", onMove);
+      document.documentElement.removeEventListener("pointerleave", onLeave);
+      cancelAnimationFrame(frame);
+      onLeave();
+    };
+  }, []);
+}

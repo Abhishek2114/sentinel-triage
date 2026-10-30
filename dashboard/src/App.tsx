@@ -8,6 +8,7 @@ import { Onboarding } from "./components/Onboarding";
 import { Overview } from "./components/Overview";
 import { Toasts } from "./components/Toasts";
 import { runbookTitle } from "./format";
+import { useTilt } from "./motion";
 import { useLiveIncidents } from "./useLiveIncidents";
 
 type View = "overview" | "incidents" | "logs" | "ship";
@@ -93,6 +94,7 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
   const [theme, cycleTheme] = useTheme();
   const searchRef = useRef<HTMLInputElement>(null);
   const live = useLiveIncidents(openSocket);
+  useTilt();
 
   const go = useCallback((r: Partial<Route> & { view: View }) => {
     window.location.hash = routeHash(r);
@@ -164,11 +166,26 @@ export function App({ openSocket }: { openSocket?: (url: string) => WebSocket } 
 
   return (
     <div className="app" data-level={level ?? "no_data"}>
+      <div className="scene" aria-hidden="true">
+        <div className="scene-horizon" />
+        <div className="scene-floor" />
+        <span className="scene-orb" style={{ "--d": 14, left: "12%", top: "22%" } as React.CSSProperties} />
+        <span className="scene-orb small" style={{ "--d": 30, left: "78%", top: "14%" } as React.CSSProperties} />
+        <span className="scene-orb tiny" style={{ "--d": 48, left: "64%", top: "34%" } as React.CSSProperties} />
+      </div>
       <a className="skip" href="#main">
         Skip to content
       </a>
       <header className="topbar">
         <div className="brand">
+          <span className="cube" aria-hidden="true">
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+            <i />
+          </span>
           <span className={`pulse pulse-${level ?? "no_data"}`} aria-hidden="true" />
           <span className="brand-name">Sentinel Triage</span>
         </div>

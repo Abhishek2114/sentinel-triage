@@ -93,7 +93,7 @@ export function Overview(props: Props) {
   const v = data.verdict;
   return (
     <>
-      <section key={v.level} className={`verdict verdict-${v.level}`} aria-labelledby="verdict-headline">
+      <section key={v.level} className={`verdict verdict-${v.level}`} aria-labelledby="verdict-headline" data-tilt="soft">
         <div className="verdict-icon" aria-hidden="true">
           {v.level === "incident" ? "!" : v.level === "warning" ? "▲" : v.level === "ok" ? "✓" : "…"}
         </div>
@@ -113,7 +113,7 @@ export function Overview(props: Props) {
       </section>
 
       {(canRunDemo || demoMode) && (
-        <section className="panel demo" aria-labelledby="demo-title">
+        <section className="panel demo" aria-labelledby="demo-title" data-tilt="soft">
           <div className="demo-body">
             <h2 id="demo-title">See it work</h2>
             <p className="muted">
@@ -149,6 +149,7 @@ export function Overview(props: Props) {
                   key={s.service}
                   data-flip={s.service}
                   className={`card state-${s.status}`}
+                  data-tilt
                   style={{ "--i": n } as React.CSSProperties}
                 >
                   <div className="card-head">
