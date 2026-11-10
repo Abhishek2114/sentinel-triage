@@ -244,7 +244,9 @@ checks, updates and backups.
 
 **Free option:** one container on Render's free plan, with Neon Postgres and Upstash Redis. No
 domain needed; it sleeps when idle. [`render.yaml`](render.yaml) holds the setup and
-[docs/DEPLOY_FREE.md](docs/DEPLOY_FREE.md) has the steps.
+[docs/DEPLOY_FREE.md](docs/DEPLOY_FREE.md) has the steps. For a free server that never sleeps,
+[the VPS guide](docs/DEPLOY.md#free-server-oracle-cloud-always-free) covers Oracle Cloud's Always
+Free ARM server.
 
 ## API (v1)
 

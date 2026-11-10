@@ -20,10 +20,66 @@ Postgres, Redis, the Celery worker and beat have no published ports.
 ## What you need
 
 - **A server** with 2 vCPU and 2 GB RAM or more, running Ubuntu 24.04. For example
-  Hetzner CX22 (about €4/month), a DigitalOcean droplet or AWS Lightsail.
+  Hetzner CX22 (about €4/month), a DigitalOcean droplet or AWS Lightsail. Oracle
+  Cloud has one for free; see [the next section](#free-server-oracle-cloud-always-free).
 - **A domain or subdomain** you can add a DNS record to, such as
-  `sentinel.yourname.dev`.
+  `sentinel.yourname.dev`. Without one, `sslip.io` gives you a name for free (see
+  the Oracle section, step 5).
 - An LLM API key is **optional**. Without one, triage writes rule-based reports.
+
+## Free server: Oracle Cloud Always Free
+
+Oracle's free tier includes an ARM server that stays on all the time, unlike
+free app hosts, which sleep when nobody visits. It's plenty for this stack. In
+2026 the free allowance is up to 2 ARM cores and 12 GB of RAM in total; check
+Oracle's current limits when you sign up. These steps replace steps 1 to 3
+below. Every image the stack uses is published for ARM, so nothing changes in
+the code.
+
+1. **Sign up** at [oracle.com/cloud/free](https://www.oracle.com/cloud/free/).
+   Choose the **home region** carefully: free ARM servers can only be created
+   there, and busy regions sometimes run out of them. Oracle asks for a card to
+   verify you; Always Free resources aren't charged.
+2. **Create the server.** Go to **Compute → Instances → Create instance**.
+   - **Image:** Canonical Ubuntu 24.04.
+   - **Shape:** Ampere, `VM.Standard.A1.Flex`, with 2 OCPUs and 12 GB of
+     memory. If Oracle reports "out of capacity", try another availability
+     domain, or 1 OCPU and 6 GB.
+   - **Networking:** keep the new virtual cloud network with a public subnet,
+     and keep "Assign a public IPv4 address" on.
+   - **SSH keys:** upload your public key (for example `~/.ssh/id_ed25519.pub`),
+     or let Oracle generate a pair and download the private key.
+
+   Note the **public IP address** once the server is running.
+3. **Open ports 80 and 443 in Oracle's network firewall.** Open the server's
+   subnet, then its **security list** (usually "Default Security List"), and
+   add an ingress rule: source `0.0.0.0/0`, protocol TCP, destination ports
+   `80,443`.
+4. **Open them on the server too.** Oracle's Ubuntu images come with
+   `iptables` rules that block everything except SSH, and `ufw` doesn't apply
+   on top of them, so skip the `ufw` line in step 3. Log in as `ubuntu` and
+   become root, so the rest of this guide's commands work as written:
+
+   ```bash
+   ssh ubuntu@<server-ip>
+   sudo -i
+   iptables -I INPUT 5 -m state --state NEW -p tcp --dport 80 -j ACCEPT
+   iptables -I INPUT 5 -m state --state NEW -p tcp --dport 443 -j ACCEPT
+   netfilter-persistent save
+   ```
+
+   Then install Docker as in step 3. With 12 GB of RAM you don't need swap.
+5. **A name for the server.** With a domain, point it at the IP as in step 2.
+   Without one, use `<ip-with-dashes>.sslip.io`. For example, `129.146.12.34`
+   becomes `129-146-12-34.sslip.io`. It already resolves to your IP, and Caddy
+   can get a certificate for it. Use that as `DOMAIN` in step 4.
+6. **Stop Oracle reclaiming it.** Oracle may take back an Always Free server
+   that stays idle for 7 days (CPU, network and memory use all under 20%). A
+   demo is idle most of the time. Upgrading the account to **Pay As You Go**
+   stops this. Always Free resources stay free, but anything else you create
+   is billed.
+
+Then continue from step 4.
 
 ## 1. Create the server
 
